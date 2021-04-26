@@ -5,7 +5,12 @@
 -- Parsing
 --
 
-module Parsing ( parseArgs ) where
+module Parsing ( parseArgs
+               , Conf(..)
+               , NumberColors
+               , NumberLimit
+               , StringFilepath
+               ) where
 
 import Control.Exception    ( throw )
 import Text.Read            ( readMaybe )
@@ -41,10 +46,10 @@ parsing parsingConf (FILEPATH : (Value val) : xs) = parsing (setFilepath parsing
 parsing _           _                             = throw $ InputError "Invalid argument(s) given."
 
 setColors :: ParsingConf -> String -> ParsingConf
-setColors (ParsingConf nbColors nbLimit stringFilepath)   val = ParsingConf (readMaybe val) nbLimit stringFilepath
+setColors (ParsingConf _ nbLimit stringFilepath) val = ParsingConf (readMaybe val) nbLimit stringFilepath
 
 setLimit :: ParsingConf -> String -> ParsingConf
-setLimit (ParsingConf nbColors nbLimit stringFilepath)    val = ParsingConf nbColors (readMaybe val) stringFilepath
+setLimit (ParsingConf nbColors _ stringFilepath) val = ParsingConf nbColors (readMaybe val) stringFilepath
 
 setFilepath :: ParsingConf -> String -> ParsingConf
-setFilepath (ParsingConf nbColors nbLimit stringFilepath) val = ParsingConf nbColors nbLimit (Just val)
+setFilepath (ParsingConf nbColors nbLimit _)     val = ParsingConf nbColors nbLimit (Just val)

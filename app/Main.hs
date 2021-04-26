@@ -14,13 +14,20 @@ import System.Exit ( ExitCode(ExitFailure)
 import System.Environment   ( getArgs )
 import Errors ( MyError(..) )
 import Usage ( printUsage )
-import Parsing ( parseArgs )
+import Parsing ( parseArgs, Conf(..) )
+import CompressorConf ( getCompressorConf )
 
 handleErrors :: MyError -> IO ()
 handleErrors (InputError e) = putStrLn e >> exitWith (ExitFailure 84)
 handleErrors (OtherError e) = putStrLn e >> exitWith (ExitFailure 84)
 
+getFilePath :: Conf -> String
+getFilePath (Conf _ _ f) = f
+
+readLines :: String -> IO [String]
+readLines = fmap lines . readFile 
+
 main :: IO ()
 main = handle
         handleErrors
-        (getArgs >>= print . parseArgs)
+        (getArgs >>= (\args -> let conf = parseArgs args in readLines (getFilePath conf) >>= print . getCompressorConf conf))

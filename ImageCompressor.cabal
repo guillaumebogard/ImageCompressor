@@ -25,8 +25,12 @@ source-repository head
 
 library
   exposed-modules:
+      Compressor
+      CompressorConf
+      CreatePixel
       Errors
       Lexing
+      OldCreatePixel
       Parsing
       Usage
   other-modules:
