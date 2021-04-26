@@ -6,9 +6,8 @@
 --
 
 module Lexing (TOKEN(..)
-             , tokenize)
-             where
-
+              , tokenize
+              ) where
 
 data TOKEN = COLORS | LIMIT | FILEPATH | Value String
 

@@ -5,11 +5,14 @@
 -- Parsing
 --
 
-module Parsing ( parseArgs
-               , Conf(..)
+module Parsing ( Conf(..)
                , NumberColors
                , NumberLimit
                , StringFilepath
+               , parseArgs
+               , getColors
+               , getLimit
+               , getFilePath
                ) where
 
 import Control.Exception    ( throw )
@@ -32,18 +35,12 @@ instance Show Conf where
 parseArgs :: [String] -> Conf
 parseArgs args = finalConfCheck $ parsing (ParsingConf Nothing Nothing Nothing) $ tokenize args
 
-finalConfCheck :: ParsingConf -> Conf
-finalConfCheck (ParsingConf Nothing         _              _                    ) = throw $ InputError "The number of colors must be set."
-finalConfCheck (ParsingConf _               Nothing        _                    ) = throw $ InputError "The convergence limit must be set."
-finalConfCheck (ParsingConf _               _              Nothing              ) = throw $ InputError "A file path must be set."
-finalConfCheck (ParsingConf (Just nbColors) (Just nbLimit) (Just stringFilepath)) = Conf nbColors nbLimit stringFilepath
-
 parsing :: ParsingConf -> [TOKEN] -> ParsingConf
 parsing parsingConf []                            = parsingConf
 parsing parsingConf (COLORS   : (Value val) : xs) = parsing (setColors   parsingConf val) xs
 parsing parsingConf (LIMIT    : (Value val) : xs) = parsing (setLimit    parsingConf val) xs
 parsing parsingConf (FILEPATH : (Value val) : xs) = parsing (setFilepath parsingConf val) xs
-parsing _           _                             = throw $ InputError "Invalid argument(s) given."
+parsing _           _                             = throw $ ArgumentError "Invalid given argument(s)."
 
 setColors :: ParsingConf -> String -> ParsingConf
 setColors (ParsingConf _ nbLimit stringFilepath) val = ParsingConf (readMaybe val) nbLimit stringFilepath
@@ -53,3 +50,18 @@ setLimit (ParsingConf nbColors _ stringFilepath) val = ParsingConf nbColors (rea
 
 setFilepath :: ParsingConf -> String -> ParsingConf
 setFilepath (ParsingConf nbColors nbLimit _)     val = ParsingConf nbColors nbLimit (Just val)
+
+finalConfCheck :: ParsingConf -> Conf
+finalConfCheck (ParsingConf Nothing         _              _                    ) = throw $ ArgumentError "The number of colors must be set."
+finalConfCheck (ParsingConf _               Nothing        _                    ) = throw $ ArgumentError "The convergence limit must be set."
+finalConfCheck (ParsingConf _               _              Nothing              ) = throw $ ArgumentError "A file path must be set."
+finalConfCheck (ParsingConf (Just nbColors) (Just nbLimit) (Just stringFilepath)) = Conf nbColors nbLimit stringFilepath
+
+getColors :: Conf -> NumberColors
+getColors (Conf nbColors _ _) = nbColors
+
+getLimit :: Conf -> NumberLimit
+getLimit (Conf _ nbLimit _) = nbLimit
+
+getFilePath :: Conf -> StringFilepath
+getFilePath (Conf _ _ stringFilepath) = stringFilepath

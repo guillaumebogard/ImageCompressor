@@ -30,7 +30,6 @@ library
       CreatePixel
       Errors
       Lexing
-      OldCreatePixel
       Parsing
       Usage
   other-modules:
