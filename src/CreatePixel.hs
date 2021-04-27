@@ -31,25 +31,20 @@ instance Show Token where
     show (Number n)   = "Number: " ++ n
 
 createPixel :: String -> Pixel
-createPixel str = finalPixelCheck $ parsing $ reduceTokens $ tokenize str
+createPixel str = finalPixelCheck $ parsing $ foldr tokenize [] str
 
-tokenize :: String -> [Token]
-tokenize []       = []
-tokenize ('(':xs) = Splitter '(' : tokenize xs
-tokenize (')':xs) = Splitter ')' : tokenize xs
-tokenize (' ':xs) = Splitter ' ' : tokenize xs
-tokenize (',':xs) = Splitter ',' : tokenize xs
-tokenize (x:xs)   = Number [x]   : tokenize xs
-
-reduceTokens :: [Token] -> [Token]
-reduceTokens []                                   = []
-reduceTokens (Number digit1 : Number digit2 : xs) = reduceTokens (Number (digit1 ++ digit2) : xs)
-reduceTokens (v:xs)                               = v : reduceTokens xs
+tokenize :: Char -> [Token] -> [Token]
+tokenize '(' t             = Splitter '('   : t
+tokenize ')' t             = Splitter ')'   : t
+tokenize ' ' t             = Splitter ' '   : t
+tokenize ',' t             = Splitter ','   : t
+tokenize x   (Number a:ts) = Number (x : a) : ts
+tokenize x   t             = Number [x]     : t
 
 parsing :: [Token] -> ParsingPixel
 parsing [Splitter '(', Number x, Splitter ',', Number y, Splitter ')', Splitter ' ', Splitter '(', Number r, Splitter ',', Number g, Splitter ',', Number b, Splitter ')']
            = ParsingPixel (readMaybe x, readMaybe y) (readMaybe r, readMaybe g, readMaybe b)
-parsing a  = throw FileParse --  $ InputError $ "There was an Error: " ++ show a
+parsing a  = throw $ ArgumentError $ "There was an Error: " ++ show a
 
 finalPixelCheck :: ParsingPixel -> Pixel
 finalPixelCheck (ParsingPixel (Nothing, _      ) (_      , _      , _      )) = throw FileParse
@@ -57,7 +52,7 @@ finalPixelCheck (ParsingPixel (_      , Nothing) (_      , _      , _      )) = 
 finalPixelCheck (ParsingPixel (_      , _      ) (Nothing, _      , _      )) = throw FileParse
 finalPixelCheck (ParsingPixel (_      , _      ) (_      , Nothing, _      )) = throw FileParse
 finalPixelCheck (ParsingPixel (_      , _      ) (_      , _      , Nothing)) = throw FileParse
-finalPixelCheck (ParsingPixel (Just x, Just y) (Just r, Just g, Just b)) | r < 0 || r > 255 = throw FileParseColorError
-                                                                         | g < 0 || g > 255 = throw FileParseColorError
-                                                                         | b < 0 || b > 255 = throw FileParseColorError
-                                                                         | otherwise = Pixel (x, y) (r, g, b)
+finalPixelCheck (ParsingPixel (Just x , Just y ) (Just r , Just g , Just b )) | r < 0 || r > 255 = throw FileParseColorError
+                                                                              | g < 0 || g > 255 = throw FileParseColorError
+                                                                              | b < 0 || b > 255 = throw FileParseColorError
+                                                                              | otherwise        = Pixel (x, y) (r, g, b)
