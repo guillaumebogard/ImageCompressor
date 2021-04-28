@@ -5,7 +5,7 @@
 -- CompressorConf
 --
 
-module CompressorConf ( getCompressorConf ) where
+module CompressorConf ( getCompressorConf, CompressorConf(..) ) where
 
 import Control.Applicative  ( some )
 import Parsing              ( Conf(..)

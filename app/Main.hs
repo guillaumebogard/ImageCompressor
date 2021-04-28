@@ -12,6 +12,7 @@ import System.Exit          ( ExitCode(ExitFailure)
                             , exitWith
                             )
 import System.Environment   ( getArgs )
+import System.Random        ( newStdGen )
 import Errors               ( MyError(..) )
 import Usage                ( printUsage )
 import CompressorConf       ( getCompressorConf )
@@ -19,6 +20,7 @@ import Parsing              ( Conf(..)
                             , parseArgs
                             , getFilePath
                             )
+import Compressor           ( compress )
 
 main :: IO ()
 main = handle
@@ -30,7 +32,8 @@ launchApp []         = printUsage
 launchApp ["-h"]     = printUsage
 launchApp ["-help"]  = printUsage
 launchApp ["--help"] = printUsage
-launchApp args       = let conf = parseArgs args in readLines (getFilePath conf) >>= print . getCompressorConf conf
+launchApp args       = let conf@(Conf _ _ filePath) = parseArgs args in readLines filePath >>= (\fileContent -> newStdGen >>= (\seed -> print $ compress seed $ getCompressorConf conf fileContent))
+-- launchApp args       = let conf@(Conf _ _ filePath) = parseArgs args in readLines filePath >>= print . getCompressorConf conf
 
 readLines :: String -> IO [String]
 readLines = fmap lines . readFile 

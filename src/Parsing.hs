@@ -23,7 +23,7 @@ import Lexing               ( TOKEN(..)
                             )
 
 type NumberColors   = Int
-type NumberLimit    = Int
+type NumberLimit    = Float
 type StringFilepath = String
 
 data ParsingConf = ParsingConf (Maybe NumberColors) (Maybe NumberLimit) (Maybe StringFilepath)

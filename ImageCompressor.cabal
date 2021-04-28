@@ -1,8 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.34.4.
+-- This file has been generated from package.yaml by hpack version 0.33.0.
 --
 -- see: https://github.com/sol/hpack
+--
+-- hash: 3b2e0c0da51c6af42b4d80d541db198ce41b1ecf43badd199b9723b36dc8a553
 
 name:           ImageCompressor
 version:        0.1.0.0
@@ -25,6 +27,7 @@ source-repository head
 
 library
   exposed-modules:
+      Cluster
       Compressor
       CompressorConf
       CreatePixel
@@ -38,6 +41,7 @@ library
       src
   build-depends:
       base >=4.7 && <5
+    , random
   default-language: Haskell2010
 
 executable ImageCompressor-exe
@@ -50,6 +54,7 @@ executable ImageCompressor-exe
   build-depends:
       ImageCompressor
     , base >=4.7 && <5
+    , random
   default-language: Haskell2010
 
 test-suite ImageCompressor-test
@@ -64,4 +69,5 @@ test-suite ImageCompressor-test
   build-depends:
       ImageCompressor
     , base >=4.7 && <5
+    , random
   default-language: Haskell2010

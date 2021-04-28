@@ -6,6 +6,7 @@
 --
 
 module CreatePixel ( Pixel(..)
+                    , ColorRGB
                     , createPixel
                     ) where
 
@@ -13,13 +14,16 @@ import Text.Read            ( readMaybe )
 import Control.Exception    ( throw )
 import Errors               ( MyError(..) )
 
-type PosX   = Int
-type PosY   = Int
-type ColorR = Int
-type ColorG = Int
-type ColorB = Int
+type PosX     = Int
+type PosY     = Int
+type Pos2D    = (PosX, PosY)
 
-data Pixel = Pixel (PosX, PosY) (ColorR, ColorG, ColorB)
+type ColorR   = Int
+type ColorG   = Int
+type ColorB   = Int
+type ColorRGB = (ColorR, ColorG, ColorB)
+
+data Pixel = Pixel Pos2D ColorRGB
 instance Show Pixel where
     show (Pixel (x, y) (r, g, b)) = "(" ++ show x ++ ", " ++ show y ++ ") (" ++ show r ++ ", " ++ show g ++ ", " ++ show b ++ ")"
 
