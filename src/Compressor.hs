@@ -12,7 +12,7 @@ module Compressor where
 import CreatePixel ( Pixel(..), ColorRGB )
 import CompressorConf ( CompressorConf(..) )
 import System.Random ( randomR, RandomGen )
-import Data.List ( sort )
+import Data.List ( sort, nub )
 import System.IO.Unsafe
 
 type Pos3D      = (Float, Float, Float)
@@ -23,11 +23,18 @@ type Move3D     = (Float, Float, Float)
 compress :: (RandomGen a) => a -> CompressorConf -> [Cluster]
 compress _    (CompressorConf 0        _       _     ) = []
 compress _    (CompressorConf _        _       []    ) = []
-compress seed (CompressorConf nbColors nbLimit pixels) = linkPixelsToClusters pixels $ generateClusters nbLimit pixels $ createFirstClustersPos pixels $ makeNbRandoms seed nbColors $ length pixels - 1
+compress seed (CompressorConf nbColors limit pixels) = linkPixelsToClusters pixels $ generateClusters limit pixels $ createFirstClustersPos pixels $ makeNbRandomsUnique seed nbColors $ length pixels - 1
 
-makeNbRandoms :: (RandomGen a) => a -> Int -> Int -> [Int]
-makeNbRandoms _    0      _        = []
-makeNbRandoms seed nbLeft maxValue = let (val, newSeed) = randomR (0, maxValue) seed in val : makeNbRandoms newSeed (nbLeft - 1) maxValue
+makeNbRandomsUnique :: (RandomGen a) => a -> Int -> Int -> [Int]
+makeNbRandomsUnique seed nbLeft maxValue = makeNbRandomsUnique' seed nbLeft maxValue []
+
+makeNbRandomsUnique' :: (RandomGen a) => a -> Int -> Int -> [Int] -> [Int]
+makeNbRandomsUnique' seed nbLeft maxValue acc | nbLeft == length acc = acc
+                                              | otherwise            = let (nacc, s) = makeNbRandoms seed (nbLeft - length acc) maxValue [] in makeNbRandomsUnique' s nbLeft maxValue $ nub $ acc ++ nacc
+
+makeNbRandoms :: (RandomGen a) => a -> Int -> Int -> [Int] -> ([Int], a)
+makeNbRandoms seed 0      _        acc = (acc, seed)
+makeNbRandoms seed nbLeft maxValue acc = let (val, newSeed) = randomR (0, maxValue) seed in makeNbRandoms newSeed (nbLeft - 1) maxValue $ val : acc
 
 createFirstClustersPos :: [Pixel] -> [Int] -> [ClusterPos]
 createFirstClustersPos pixels idxs = createFirstClustersPos' 0 pixels $ sort idxs
@@ -60,6 +67,7 @@ genMove = genMove' 0
 genMove' :: Int -> [ClusterPos] -> [(Int, ColorRGB)] -> [(Int, Move3D)]
 genMove' _ []               _                         = []
 genMove' _ _                []                        = []
+genMove' i (_         : cs) ((0,  _)            : ts) = (i, (0, 0, 0)) : genMove' (i + 1) cs ts
 genMove' i ((x, y, z) : cs) ((nb, (cx, cy, cz)) : ts) = (i, (fromIntegral cx `floatSafeDiv` fromIntegral nb - x
                                                             , fromIntegral cy `floatSafeDiv` fromIntegral nb - y
                                                             , fromIntegral cz `floatSafeDiv` fromIntegral nb - z)) : genMove' (i + 1) cs ts

@@ -35,9 +35,11 @@ spec = do
                  ]
     let seed = mkStdGen 230844504580
 
-    it "makeNbRandoms" $ makeNbRandoms seed 0 9   `shouldBe` []
-    it "makeNbRandoms" $ makeNbRandoms seed 2 9   `shouldBe` [7, 8]
-    it "makeNbRandoms" $ makeNbRandoms seed 4 100 `shouldBe` [68,90,6,52]
+    it "makeNbRandomsUnique" $ makeNbRandomsUnique seed 0 9   `shouldBe` []
+    it "makeNbRandomsUnique" $ makeNbRandomsUnique seed 2 9   `shouldBe` [8, 7]
+    it "makeNbRandomsUnique" $ makeNbRandomsUnique seed 4 100 `shouldBe` [52, 6, 90, 68]
+    it "makeNbRandomsUnique" $ makeNbRandomsUnique seed 2 2   `shouldBe` [0, 2]
+    it "makeNbRandomsUnique" $ makeNbRandomsUnique seed 7 7   `shouldBe` [2, 1, 6, 7, 0, 5, 4]
 
     it "createFirstClustersPos" $ createFirstClustersPos [] []  `shouldBe` []
     it "createFirstClustersPos" $ createFirstClustersPos [] [1] `shouldBe` []
@@ -167,6 +169,7 @@ spec = do
     it "generateClusters" $ generateClusters 0.8 pixels [(33, 18, 109), (35, 18, 109)] `shouldBe` ([(33.0,28.5,112.0), (34.125,19.5,109.75)], [(33.0,24.75,111.25), (34.5,19.0,109.5)])
     it "generateClusters" $ generateClusters 0.8 pixels [(33, 32, 112), (35, 21, 109)] `shouldBe` ([(33, 32, 112), (34, 20.11111, 110)], [(33, 32, 112), (35, 21, 109)])
     it "generateClusters" $ generateClusters 0.8 pixels [(33, 32, 112), (34, 20.11111, 110)] `shouldBe` ([(33, 32, 112), (34, 20.11111, 110)], [(33, 32, 112), (34, 20.11111, 110)])
+    it "generateClusters" $ generateClusters 0.8 pixels [(33, 18, 109), (33, 18, 109)] `shouldBe` ([(34.166668, 23.5, 111) , (33.5,18, 109)], [(33.9, 21.3, 110.2), (33, 18, 109)])
 
     it "compress" $ compress seed (CompressorConf 0 0.8 pixels) `shouldBe` []
     it "compress" $ compress seed (CompressorConf 2 0.8 []    ) `shouldBe` []

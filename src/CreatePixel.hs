@@ -25,7 +25,7 @@ type ColorRGB = (ColorR, ColorG, ColorB)
 
 data Pixel = Pixel Pos2D ColorRGB
 instance Show Pixel where
-    show (Pixel (x, y) (r, g, b)) = "(" ++ show x ++ ", " ++ show y ++ ") (" ++ show r ++ ", " ++ show g ++ ", " ++ show b ++ ")"
+    show (Pixel pos color) = show pos ++ ' ' : show color
 instance Eq Pixel where
     (==) (Pixel (xa, ya) (ra, ga, ba)) (Pixel (xb, yb) (rb, gb, bb)) = ra == rb && ga == gb && ba == bb && xa == xb && ya == yb
 
