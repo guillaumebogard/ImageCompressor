@@ -36,3 +36,11 @@ example.txt
 # Bin
 
 imageCompressor
+
+# Tmp Files
+
+*[Tt][Mm][Pp]*
+*[Tt][Oo][ _\-][Dd][Ee][Ll]*
+*[Tt][Oo][Dd][Ee][Ll]*
+*zip*
+

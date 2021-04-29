@@ -12,7 +12,7 @@ import System.Exit          ( ExitCode(ExitFailure)
                             , exitWith
                             )
 import System.Environment   ( getArgs )
-import System.Random        ( newStdGen )
+import System.Random        ( newStdGen, mkStdGen )
 import Errors               ( MyError(..) )
 import Usage                ( printUsage )
 import CompressorConf       ( getCompressorConf )
@@ -20,7 +20,7 @@ import Parsing              ( Conf(..)
                             , parseArgs
                             , getFilePath
                             )
-import Compressor           ( compress )
+import Compressor           ( compress, Cluster )
 
 main :: IO ()
 main = handle
@@ -32,8 +32,12 @@ launchApp []         = printUsage
 launchApp ["-h"]     = printUsage
 launchApp ["-help"]  = printUsage
 launchApp ["--help"] = printUsage
-launchApp args       = let conf@(Conf _ _ filePath) = parseArgs args in readLines filePath >>= (\fileContent -> newStdGen >>= (\seed -> print $ compress seed $ getCompressorConf conf fileContent))
+launchApp args       = let conf@(Conf _ _ filePath) = parseArgs args in readLines filePath >>= (\fileContent -> newStdGen >>= (\seed -> printClusters $ compress seed $ getCompressorConf conf fileContent))
+-- launchApp args       = let conf@(Conf _ _ filePath) = parseArgs args in readLines filePath >>= print . compress (mkStdGen 230844504580) . getCompressorConf conf
 -- launchApp args       = let conf@(Conf _ _ filePath) = parseArgs args in readLines filePath >>= print . getCompressorConf conf
+
+printClusters :: [Cluster] -> IO ()
+printClusters = mapM_ (\((pos, prev), ps) -> putStrLn "--" >> print pos >> putStrLn "-" >> mapM_ print ps)
 
 readLines :: String -> IO [String]
 readLines = fmap lines . readFile 

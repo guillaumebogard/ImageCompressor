@@ -49,4 +49,5 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - ImageCompressor
+    - hspec
     - random

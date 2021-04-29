@@ -7,6 +7,8 @@
 
 BINARY_PATH		:= $(shell stack path --local-install-root)
 
+COVERAGE_PATH   := $(shell stack path --local-hpc-root)
+
 NAME			=	ImageCompressor
 
 TA_NAME			=	imageCompressor
@@ -26,6 +28,10 @@ re:: fclean
 re:: all
 
 tests_run:
-	stack test
+	stack test --coverage
 
-.PHONY: all clean fclean re tests_run
+coverage:
+	google-chrome-stable $(COVERAGE_PATH)/index.html
+
+
+.PHONY: all clean fclean re tests_run coverage
