@@ -12,13 +12,16 @@ import System.Exit          ( ExitCode(ExitFailure)
                             , exitWith
                             )
 import System.Environment   ( getArgs )
-import System.Random        ( newStdGen, mkStdGen )
-import Errors               ( MyError(..) )
+import System.Random        ( newStdGen )
+import Errors               ( MyError(ArgumentError
+                                     , FileParse
+                                     , FileParseColorError
+                                     )
+                            )
 import Usage                ( printUsage )
 import CompressorConf       ( getCompressorConf )
-import Parsing              ( Conf(..)
+import Parsing              ( Conf( Conf )
                             , parseArgs
-                            , getFilePath
                             )
 import Compressor           ( compress, Cluster )
 
@@ -37,7 +40,10 @@ launchApp args       = let conf@(Conf _ _ filePath) = parseArgs args in readLine
 -- launchApp args       = let conf@(Conf _ _ filePath) = parseArgs args in readLines filePath >>= print . getCompressorConf conf
 
 printClusters :: [Cluster] -> IO ()
-printClusters = mapM_ (\((pos, prev), ps) -> putStrLn "--" >> print pos >> putStrLn "-" >> mapM_ print ps)
+printClusters = mapM_ (\((pos, _), ps) -> putStrLn "--" >> print (tupleToInt pos) >> putStrLn "-" >> mapM_ print ps)
+
+tupleToInt :: (Float, Float, Float) -> (Int, Int, Int)
+tupleToInt (x, y, z) = (round x, round y, round z)
 
 readLines :: String -> IO [String]
 readLines = fmap lines . readFile 

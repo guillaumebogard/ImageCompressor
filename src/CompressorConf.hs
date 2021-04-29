@@ -7,7 +7,7 @@
 
 module CompressorConf ( getCompressorConf, CompressorConf(..) ) where
 
-import Control.Applicative  ( some )
+-- import Control.Applicative  ( some )
 import Parsing              ( Conf(..)
                             , NumberColors
                             , NumberLimit

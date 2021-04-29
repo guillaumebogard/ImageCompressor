@@ -44,6 +44,7 @@ spec = do
     it "createFirstClustersPos" $ createFirstClustersPos pixels [1, 7] `shouldBe` [(33, 18, 109), (35, 18, 109)]
     it "createFirstClustersPos" $ createFirstClustersPos pixels [3, 0, 9] `shouldBe` [(33,18,109), (33,21,112), (38,21,112)]
 
+    it "insertPixel" $ insertPixel [] (Pixel (0, 0) (33, 21, 109)) 0 `shouldBe` []
     it "insertPixel" $ insertPixel [(((33.0,18.0,109.0), (0, 0, 0)), []), (((34.166668,23.5,111.0), (0, 0, 0)), [])] (Pixel (0, 0) (33, 21, 109)) 0 `shouldBe` [(((33.0,18.0,109.0), (0, 0, 0)), [Pixel (0, 0) (33, 21, 109)]), (((34.166668,23.5,111.0), (0, 0, 0)), [])]
     it "insertPixel" $ insertPixel [(((33.0,18.0,109.0), (0, 0, 0)), []), (((34.166668,23.5,111.0), (0, 0, 0)), [])] (Pixel (0, 0) (33, 21, 109)) 1 `shouldBe` [(((33.0,18.0,109.0), (0, 0, 0)), []), (((34.166668,23.5,111.0), (0, 0, 0)), [Pixel (0, 0) (33, 21, 109)])]
 
@@ -81,16 +82,20 @@ spec = do
             ])
         ]
 
+    it "floatSafeDiv" $ floatSafeDiv 2 0 `shouldBe` 0
+
     it "genMove" $ genMove [] [] `shouldBe` []
+    it "genMove" $ genMove [(0, 0, 0)] [] `shouldBe` []
     it "genMove" $ genMove [(33.0,21.11111,113.5), (33.0,32.0,112.0)] [(9, (306, 181, 990)), (1, (33, 32, 112))] `shouldBe` [(0, (1, -1, -3.5)), (1, (0, 0, 0))]
 
+    it "filterMoves" $ filterMoves 0.8 [] `shouldBe` []
     it "filterMoves" $ filterMoves 0.8 [(0, (1, -1, -3.5)), (1, (0, 0, 0))] `shouldBe` [(0, (1, -1, -3.5)), (1, (0, 0, 0))]
     it "filterMoves" $ filterMoves 1.9 [(0, (0, 2.1, 0)),   (1, (0, 2, 0))] `shouldBe` [(0, (0, 2.1, 0)), (1, (0, 2, 0))]
     it "filterMoves" $ filterMoves 2   [(0, (0, 2.1, 0)),   (1, (0, 2, 0))] `shouldBe` [(0, (0, 2.1, 0)), (1, (0, 2, 0))]
     it "filterMoves" $ filterMoves 2.1 [(0, (0, 2.1, 0)),   (1, (0, 2, 0))] `shouldBe` []
     it "filterMoves" $ filterMoves 0.8 [(0, (0, -0.5, -0.1)), (1, (0, 0.6, 0))] `shouldBe` []
 
-
+    it "findIdx" $ findIdx [] (33, 18, 109) `shouldBe` -1
     it "findIdx" $ findIdx [(34.0, 20.11111, 110.0), (33.0, 32.0, 112.0)] (33, 18, 109) `shouldBe` 0
     it "findIdx" $ findIdx [(34.0, 20.11111, 110.0), (33.0, 32.0, 112.0)] (33, 18, 109) `shouldBe` 0
     it "findIdx" $ findIdx [(34.0, 20.11111, 110.0), (33.0, 32.0, 112.0)] (33, 21, 109) `shouldBe` 0
@@ -135,6 +140,16 @@ spec = do
     it "findIdx" $ findIdx [(33.57143,19.285715,109.42857), (33.0,28.5,112.0)] (33, 25, 112) `shouldBe` 1
     it "findIdx" $ findIdx [(33.57143,19.285715,109.42857), (33.0,28.5,112.0)] (33, 32, 112) `shouldBe` 1
 
+    it "findIdx" $ findIdx [(4, 4, 0), (4, 4, 8), (4, 4, 4), (4, 4, 12)] (8, 4, -2) `shouldBe` 0
+    it "findIdx" $ findIdx [(4, 4, 0), (4, 4, 8), (4, 4, 4), (4, 4, 12)] (8, 4, 2)  `shouldBe` 0
+    it "findIdx" $ findIdx [(4, 4, 0), (4, 4, 8), (4, 4, 4), (4, 4, 12)] (8, 4, 6)  `shouldBe` 1
+    it "findIdx" $ findIdx [(4, 4, 0), (4, 4, 8), (4, 4, 4), (4, 4, 12)] (8, 4, 7)  `shouldBe` 1
+    it "findIdx" $ findIdx [(4, 4, 0), (4, 4, 8), (4, 4, 4), (4, 4, 12)] (8, 4, 10) `shouldBe` 1
+    it "findIdx" $ findIdx [(4, 4, 0), (4, 4, 8), (4, 4, 4), (4, 4, 12)] (8, 4, 3)  `shouldBe` 2
+    it "findIdx" $ findIdx [(4, 4, 0), (4, 4, 8), (4, 4, 4), (4, 4, 12)] (8, 4, 11) `shouldBe` 3
+    it "findIdx" $ findIdx [(4, 4, 0), (4, 4, 8), (4, 4, 4), (4, 4, 12)] (8, 4, 17) `shouldBe` 3
+
+    it "insertCol" $ insertCol [] (0, 0, 0) 0 `shouldBe` []
     it "insertCol" $ insertCol [(9, (306, 181, 990)), (1, (33, 32, 112))] (0, 0, 0) 0 `shouldBe` [(10, (306, 181, 990)), (1, (33, 32, 112))]
     it "insertCol" $ insertCol [(9, (306, 181, 990)), (1, (33, 32, 112))] (33, 244, 109) 0 `shouldBe` [(10, (306+33, 181+244, 990+109)), (1, (33, 32, 112))]
     it "insertCol" $ insertCol [(9, (306, 181, 990)), (1, (33, 32, 112))] (33, 244, 109) 1 `shouldBe` [(9, (306, 181, 990)), (2, (33+33, 32+244, 112+109))]

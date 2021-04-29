@@ -14,7 +14,7 @@ NAME			=	ImageCompressor
 TA_NAME			=	imageCompressor
 
 all:
-	stack build
+	stack build --pedantic
 	cp $(BINARY_PATH)/bin/$(NAME)-exe ./$(TA_NAME)
 
 clean:

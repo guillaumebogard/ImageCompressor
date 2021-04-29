@@ -7,6 +7,6 @@
 
 module Cluster ( Cluster ) where
 
-import CreatePixel ( ColorRGB )
+-- import CreatePixel ( ColorRGB )
 
 type Cluster = (Float, Float, Float)

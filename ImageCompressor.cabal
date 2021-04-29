@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 15fa8d0f05eb8d7c83bff01721b276bd722c8c6fe2ee2050a2c67752d2f7bf2c
+-- hash: 61edea96cd09283c1394ecf7e4634a85d789026c0b454255211d17318b57ff38
 
 name:           ImageCompressor
 version:        0.1.0.0
@@ -50,7 +50,7 @@ executable ImageCompressor-exe
       Paths_ImageCompressor
   hs-source-dirs:
       app
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       ImageCompressor
     , base >=4.7 && <5
