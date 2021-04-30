@@ -9,29 +9,32 @@ BINARY_PATH		:= $(shell stack path --local-install-root)
 
 COVERAGE_PATH   := $(shell stack path --local-hpc-root)
 
-NAME			=	ImageCompressor
+STACK_NAME		=	ImageCompressor
 
-TA_NAME			=	imageCompressor
+NAME			=	imageCompressor
 
 all:
 	stack build --pedantic
-	cp $(BINARY_PATH)/bin/$(NAME)-exe ./$(TA_NAME)
+	cp $(BINARY_PATH)/bin/$(STACK_NAME)-exe ./$(NAME)
+.PHONY:	all
 
 clean:
 	stack clean
+.PHONY:	clean
 
 fclean: clean
 	stack purge
-	$(RM) $(TA_NAME)
+	$(RM) $(NAME)
+.PHONY:	fclean
 
 re:: fclean
 re:: all
+.PHONY:	re
 
 tests_run:
 	stack test --coverage
+.PHONY:	tests_run
 
 coverage:
 	google-chrome-stable $(COVERAGE_PATH)/index.html
-
-
-.PHONY: all clean fclean re tests_run coverage
+.PHONY:	coverage

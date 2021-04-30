@@ -5,35 +5,35 @@
 -- Parsing
 --
 
-module Parsing ( Conf(..)
-               , NumberColors
+module Parsing ( NumberColors
                , NumberLimit
                , StringFilepath
+               , Conf(..)
                , parseArgs
-               , getColors
-               , getLimit
-               , getFilePath
                ) where
 
 import Control.Exception    ( throw )
 import Text.Read            ( readMaybe )
 import Errors               ( MyError(..) )
-import Lexing               ( TOKEN(..)
-                            , tokenize
-                            )
+
+data TOKEN = COLORS | LIMIT | FILEPATH | Value String
 
 type NumberColors   = Int
 type NumberLimit    = Float
 type StringFilepath = String
 
-data ParsingConf = ParsingConf (Maybe NumberColors) (Maybe NumberLimit) (Maybe StringFilepath)
-
-data Conf        = Conf NumberColors NumberLimit StringFilepath
-instance Show Conf where
-    show (Conf n l f) = "Nb Colors: " ++ show n ++ ", Limit: " ++ show l ++ ", File Path: " ++ show f
+data ParsingConf    = ParsingConf (Maybe NumberColors) (Maybe NumberLimit) (Maybe StringFilepath)
+data Conf           = Conf         NumberColors         NumberLimit         StringFilepath
 
 parseArgs :: [String] -> Conf
 parseArgs args = finalConfCheck $ parsing (ParsingConf Nothing Nothing Nothing) $ tokenize args
+
+tokenize :: [String] -> [TOKEN]
+tokenize [] = []
+tokenize ("-n":xs) = COLORS : tokenize xs
+tokenize ("-l":xs) = LIMIT : tokenize xs
+tokenize ("-f":xs) = FILEPATH : tokenize xs
+tokenize (x:xs)    = Value x : tokenize xs
 
 parsing :: ParsingConf -> [TOKEN] -> ParsingConf
 parsing parsingConf []                            = parsingConf
@@ -52,16 +52,7 @@ setFilepath :: ParsingConf -> String -> ParsingConf
 setFilepath (ParsingConf nbColors nbLimit _)     val = ParsingConf nbColors nbLimit (Just val)
 
 finalConfCheck :: ParsingConf -> Conf
-finalConfCheck (ParsingConf Nothing         _              _                    ) = throw $ ArgumentError "The number of colors must be set."
-finalConfCheck (ParsingConf _               Nothing        _                    ) = throw $ ArgumentError "The convergence limit must be set."
-finalConfCheck (ParsingConf _               _              Nothing              ) = throw $ ArgumentError "A file path must be set."
+finalConfCheck (ParsingConf Nothing         _              _                    ) = throw $ ArgumentError "Missing/Invalid number of colors."
+finalConfCheck (ParsingConf _               Nothing        _                    ) = throw $ ArgumentError "Missing/Invalid convergence limit."
+finalConfCheck (ParsingConf _               _              Nothing              ) = throw $ ArgumentError "Missing/Invalid file path."
 finalConfCheck (ParsingConf (Just nbColors) (Just nbLimit) (Just stringFilepath)) = Conf nbColors nbLimit stringFilepath
-
-getColors :: Conf -> NumberColors
-getColors (Conf nbColors _ _) = nbColors
-
-getLimit :: Conf -> NumberLimit
-getLimit (Conf _ nbLimit _) = nbLimit
-
-getFilePath :: Conf -> StringFilepath
-getFilePath (Conf _ _ stringFilepath) = stringFilepath

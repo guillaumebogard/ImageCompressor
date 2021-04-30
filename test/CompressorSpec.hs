@@ -84,18 +84,18 @@ spec = do
             ])
         ]
 
-    it "floatSafeDiv" $ floatSafeDiv 2 0 `shouldBe` 0
+    it "safeDivToFloat" $ safeDivToFloat 2 0 `shouldBe` 0
 
     it "genMove" $ genMove [] [] `shouldBe` []
     it "genMove" $ genMove [(0, 0, 0)] [] `shouldBe` []
-    it "genMove" $ genMove [(33.0,21.11111,113.5), (33.0,32.0,112.0)] [(9, (306, 181, 990)), (1, (33, 32, 112))] `shouldBe` [(0, (1, -1, -3.5)), (1, (0, 0, 0))]
+    it "genMove" $ genMove [(33.0,21.11111,113.5), (33.0,32.0,112.0)] [(9, (306, 181, 990)), (1, (33, 32, 112))] `shouldBe` [(1, -1, -3.5), (0, 0, 0)]
 
     it "filterMoves" $ filterMoves 0.8 [] `shouldBe` []
-    it "filterMoves" $ filterMoves 0.8 [(0, (1, -1, -3.5)), (1, (0, 0, 0))] `shouldBe` [(0, (1, -1, -3.5)), (1, (0, 0, 0))]
-    it "filterMoves" $ filterMoves 1.9 [(0, (0, 2.1, 0)),   (1, (0, 2, 0))] `shouldBe` [(0, (0, 2.1, 0)), (1, (0, 2, 0))]
-    it "filterMoves" $ filterMoves 2   [(0, (0, 2.1, 0)),   (1, (0, 2, 0))] `shouldBe` [(0, (0, 2.1, 0)), (1, (0, 2, 0))]
-    it "filterMoves" $ filterMoves 2.1 [(0, (0, 2.1, 0)),   (1, (0, 2, 0))] `shouldBe` []
-    it "filterMoves" $ filterMoves 0.8 [(0, (0, -0.5, -0.1)), (1, (0, 0.6, 0))] `shouldBe` []
+    it "filterMoves" $ filterMoves 0.8 [(1, -1, -3.5),   (0, 0, 0)] `shouldBe` [(1, -1, -3.5), (0, 0, 0)]
+    it "filterMoves" $ filterMoves 1.9 [(0, 2.1, 0),     (0, 2, 0)] `shouldBe` [(0, 2.1, 0), (0, 2, 0)]
+    it "filterMoves" $ filterMoves 2   [(0, 2.1, 0),     (0, 2, 0)] `shouldBe` [(0, 2.1, 0), (0, 2, 0)]
+    it "filterMoves" $ filterMoves 2.1 [(0, 2.1, 0),     (0, 2, 0)] `shouldBe` []
+    it "filterMoves" $ filterMoves 0.8 [(0, -0.5, -0.1), (0, 0.6, 0)] `shouldBe` []
 
     it "findIdx" $ findIdx [] (33, 18, 109) `shouldBe` -1
     it "findIdx" $ findIdx [(34.0, 20.11111, 110.0), (33.0, 32.0, 112.0)] (33, 18, 109) `shouldBe` 0
@@ -162,9 +162,9 @@ spec = do
     it "generateEmptyTotals" $ generateEmptyTotals 4 `shouldBe` [(0, (0, 0, 0)), (0, (0, 0, 0)), (0, (0, 0, 0)), (0, (0, 0, 0))]
 
     it "appMove" $ appMove [(33.0,18.0,109.0), (34.166668,23.5,111.0)] [] `shouldBe` [(33.0,18.0,109.0), (34.166668,23.5,111.0)]
-    it "appMove" $ appMove [(33.0,18.0,109.0), (34.166668,23.5,111.0)] [(1, (1, -1, 4))] `shouldBe` [(33.0,18.0,109.0), (34.166668+1,23.5-1,111.0+4)]
-    it "appMove" $ appMove [(33.0,18.0,109.0), (34.166668,23.5,111.0)] [(0, (1.5, -10, 4.12)), (1, (1, -1, 4))] `shouldBe` [(33.0+1.5,18.0-10,109.0+4.12), (34.166668+1,23.5-1,111.0+4)]
-    it "appMove" $ appMove [(33.0,18.0,109.0), (1, 2, 3), (34.166668,23.5,111.0)] [(0, (1.5, -10, 4.12)), (2, (1, -1, 4))] `shouldBe` [(33.0+1.5,18.0-10,109.0+4.12), (1, 2, 3), (34.166668+1,23.5-1,111.0+4)]
+    it "appMove" $ appMove [(33.0,18.0,109.0), (34.166668,23.5,111.0)] [(0, 0, 0), (1, -1, 4)] `shouldBe` [(33.0,18.0,109.0), (34.166668+1,23.5-1,111.0+4)]
+    it "appMove" $ appMove [(33.0,18.0,109.0), (34.166668,23.5,111.0)] [(1.5, -10, 4.12), (1, -1, 4)] `shouldBe` [(33.0+1.5,18.0-10,109.0+4.12), (34.166668+1,23.5-1,111.0+4)]
+    it "appMove" $ appMove [(33.0,18.0,109.0), (1, 2, 3), (34.166668,23.5,111.0)] [(1.5, -10, 4.12), (0, 0, 0), (1, -1, 4)] `shouldBe` [(33.0+1.5,18.0-10,109.0+4.12), (1, 2, 3), (34.166668+1,23.5-1,111.0+4)]
 
     it "generateClusters" $ generateClusters 0.8 pixels [(33, 18, 109), (35, 18, 109)] `shouldBe` ([(33.0,28.5,112.0), (34.125,19.5,109.75)], [(33.0,24.75,111.25), (34.5,19.0,109.5)])
     it "generateClusters" $ generateClusters 0.8 pixels [(33, 32, 112), (35, 21, 109)] `shouldBe` ([(33, 32, 112), (34, 20.11111, 110)], [(33, 32, 112), (35, 21, 109)])

@@ -13,7 +13,6 @@ import CreatePixel ( Pixel(..), ColorRGB )
 import CompressorConf ( CompressorConf(..) )
 import System.Random ( randomR, RandomGen )
 import Data.List ( sort, nub )
-import System.IO.Unsafe
 
 type Pos3D      = (Float, Float, Float)
 type ClusterPos = Pos3D
@@ -29,8 +28,9 @@ makeNbRandomsUnique :: (RandomGen a) => a -> Int -> Int -> [Int]
 makeNbRandomsUnique seed nbLeft maxValue = makeNbRandomsUnique' seed nbLeft maxValue []
 
 makeNbRandomsUnique' :: (RandomGen a) => a -> Int -> Int -> [Int] -> [Int]
-makeNbRandomsUnique' seed nbLeft maxValue acc | nbLeft == length acc = acc
-                                              | otherwise            = let (nacc, s) = makeNbRandoms seed (nbLeft - length acc) maxValue [] in makeNbRandomsUnique' s nbLeft maxValue $ nub $ acc ++ nacc
+makeNbRandomsUnique' seed nbLeft maxValue acc
+        | nbLeft == length acc = acc
+        | otherwise            = let (nacc, s) = makeNbRandoms seed (nbLeft - length acc) maxValue [] in makeNbRandomsUnique' s nbLeft maxValue $ nub $ acc ++ nacc
 
 makeNbRandoms :: (RandomGen a) => a -> Int -> Int -> [Int] -> ([Int], a)
 makeNbRandoms seed 0      _        acc = (acc, seed)
@@ -46,53 +46,40 @@ createFirstClustersPos' idx (Pixel _ col : ps) idxs@(x:xs)  | x == idx  = tupleT
                                                             | otherwise = createFirstClustersPos' (idx + 1) ps idxs
 
 generateClusters :: Float -> [Pixel] -> [ClusterPos] -> ([ClusterPos], [ClusterPos])
-generateClusters limit ps clusters = generateClusters' limit ps (clusters, clusters) [(0, (0, 0, 0))]
+generateClusters limit ps clusters = generateClusters' limit ps (clusters, clusters) [(0, 0, 0)]
 
-generateClusters' :: Float -> [Pixel] -> ([ClusterPos], [ClusterPos]) -> [(Int, Move3D)] -> ([ClusterPos], [ClusterPos])
+generateClusters' :: Float -> [Pixel] -> ([ClusterPos], [ClusterPos]) -> [Move3D] -> ([ClusterPos], [ClusterPos])
 generateClusters' _     _  res         []   = res
 generateClusters' limit ps (prevcs, _) move = let cs = appMove prevcs move in generateClusters' limit ps (cs, prevcs) $ filterMoves limit $ genMove cs $ genOneTime ps cs
 
-appMove :: [ClusterPos] -> [(Int, Move3D)] -> [ClusterPos]
-appMove = appMove' 0
+appMove :: [ClusterPos] -> [Move3D] -> [ClusterPos]
+appMove []               _                   = []
+appMove cs               []                  = cs
+appMove ((x, y, z) : cs) ((mx, my, mz) : ms) = (x + mx, y + my, z + mz) : appMove cs ms
 
-appMove' :: Int -> [ClusterPos] -> [(Int, Move3D)] -> [ClusterPos]
-appMove' _ []                 _                                = []
-appMove' _ cs                 []                               = cs
-appMove' i (c@(x, y, z) : cs) moves@((idx, (mx, my, mz)) : ms) | i == idx  = (x + mx, y + my, z + mz) : appMove' (i + 1) cs ms
-                                                               | otherwise = c : appMove' (i + 1) cs moves
+genMove :: [ClusterPos] -> [(Int, ColorRGB)] -> [Move3D]
+genMove = zipWith genMove'
 
-genMove :: [ClusterPos] -> [(Int, ColorRGB)] -> [(Int, Move3D)]
-genMove = genMove' 0
+genMove' :: ClusterPos -> (Int, ColorRGB) -> Move3D
+genMove' _         (0,  _)            = (0, 0, 0)
+genMove' (x, y, z) (nb, (cx, cy, cz)) = ( cx `safeDivToFloat` nb - x
+                                        , cy `safeDivToFloat` nb - y
+                                        , cz `safeDivToFloat` nb - z)
 
-genMove' :: Int -> [ClusterPos] -> [(Int, ColorRGB)] -> [(Int, Move3D)]
-genMove' _ []               _                         = []
-genMove' _ _                []                        = []
-genMove' i (_         : cs) ((0,  _)            : ts) = (i, (0, 0, 0)) : genMove' (i + 1) cs ts
-genMove' i ((x, y, z) : cs) ((nb, (cx, cy, cz)) : ts) = (i, (fromIntegral cx `floatSafeDiv` fromIntegral nb - x
-                                                            , fromIntegral cy `floatSafeDiv` fromIntegral nb - y
-                                                            , fromIntegral cz `floatSafeDiv` fromIntegral nb - z)) : genMove' (i + 1) cs ts
+safeDivToFloat :: Int -> Int -> Float
+safeDivToFloat _ 0 = 0
+safeDivToFloat a b = fromIntegral a / fromIntegral b
 
-floatSafeDiv :: Float -> Float -> Float
-floatSafeDiv _ 0 = 0
-floatSafeDiv a b = a / b
-
-
-logIO :: Show a => a -> IO a
-logIO var = do print var
-               return var
-
-logVar :: Show a => a -> a
-logVar var = unsafePerformIO $ logIO var
-
-filterMoves :: Float -> [(Int, Move3D)] -> [(Int, Move3D)]
+filterMoves :: Float -> [Move3D] -> [Move3D]
 filterMoves limit moves = filterMoves' limit moves moves $ length moves
 
-filterMoves' :: Float -> [(Int, Move3D)] -> [(Int, Move3D)] -> Int -> [(Int, Move3D)]
-filterMoves' _     _     []                    0    = []
-filterMoves' _     moves _                     0    = moves
-filterMoves' _     _     []                    _    = []
-filterMoves' limit moves mvs@((_, pos) : ms) left | vect3dLength pos <= limit = filterMoves' limit moves ms  $ left - 1
-                                                    | otherwise                 = filterMoves' limit moves mvs $ left - 1
+filterMoves' :: Float -> [Move3D] -> [Move3D] -> Int -> [Move3D]
+filterMoves' _     _     []             0       = []
+filterMoves' _     moves _              0       = moves
+filterMoves' _     _     []             _       = []
+filterMoves' limit moves mvs@(pos : ms) left
+                    | vect3dLength pos <= limit = filterMoves' limit moves ms  $ left - 1
+                    | otherwise                 = filterMoves' limit moves mvs $ left - 1
 
 vect3dLength :: (Float, Float, Float) -> Float
 vect3dLength (x, y, z) = sqrt (x ^ (2 :: Integer) + y ^ (2 :: Integer) + z ^ (2 :: Integer))
@@ -113,9 +100,10 @@ findIdx []     _   = -1
 findIdx (c:cs) col = findIdx' col 1 cs c 0 $ get3dDistance c $ tupleToFloat col
 
 findIdx' :: ColorRGB -> Int -> [ClusterPos] -> ClusterPos -> Int -> Float -> Int
-findIdx' _   _ []     _    idx     _        = idx
-findIdx' col i (c:cs) best bestIdx bestDist | get3dDistance c (tupleToFloat col) < bestDist = findIdx' col (i + 1) cs c    i       $ get3dDistance c $ tupleToFloat col
-                                            | otherwise                                     = findIdx' col (i + 1) cs best bestIdx bestDist
+findIdx' _   _ []     _    idx     _                    = idx
+findIdx' col i (c:cs) best bestIdx bestDist
+        | get3dDistance c (tupleToFloat col) < bestDist = findIdx' col (i + 1) cs c    i       $ get3dDistance c $ tupleToFloat col
+        | otherwise                                     = findIdx' col (i + 1) cs best bestIdx bestDist
 
 tupleToFloat :: (Int, Int, Int) -> (Float, Float, Float)
 tupleToFloat (x, y, z) = (fromIntegral x, fromIntegral y, fromIntegral z)
@@ -125,8 +113,9 @@ insertCol = insertCol' 0
 
 insertCol' :: Int -> [(Int, ColorRGB)] -> ColorRGB -> Int -> [(Int, ColorRGB)]
 insertCol' _ []                          _              _   = []
-insertCol' i (t@(nb, (tx, ty, tz)) : ts) c@(cx, cy, cz) idx | i == idx  = (nb + 1, (tx + cx, ty + cy, tz + cz)) : ts
-                                                            | otherwise = t : insertCol' (i + 1) ts c idx
+insertCol' i (t@(nb, (tx, ty, tz)) : ts) c@(cx, cy, cz) idx
+                                                | i == idx  = (nb + 1, (tx + cx, ty + cy, tz + cz)) : ts
+                                                | otherwise = t : insertCol' (i + 1) ts c idx
 
 linkPixelsToClusters :: [Pixel] -> ([ClusterPos], [ClusterPos]) -> [Cluster]
 linkPixelsToClusters ps (cs, prev) = foldr (\p@(Pixel _ col) acc -> insertPixel acc p $ findIdx prev col) (zipWith (\c pr -> ((c, pr), [])) cs prev) ps

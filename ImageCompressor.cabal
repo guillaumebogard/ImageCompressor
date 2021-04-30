@@ -32,7 +32,6 @@ library
       CompressorConf
       CreatePixel
       Errors
-      Lexing
       Parsing
       Usage
   other-modules:
