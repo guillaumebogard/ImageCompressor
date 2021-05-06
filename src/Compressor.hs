@@ -18,62 +18,69 @@ import RandomManager ( makeNbRandomsUnique )
 import Vector.Vector
 import Cluster.Cluster
 
--- use newtypes or datas instead of types
+type PrevClusterPos = ClusterPos
 
 compress :: (RandomGen a) => a -> CompressorConf -> [Cluster]
-compress _    (CompressorConf 0        _       _     ) = []
-compress _    (CompressorConf _        _       []    ) = []
-compress seed (CompressorConf nbColors limit pixels) = linkPixelsToClusters pixels $ generateClusters limit pixels $ createFirstClustersPos pixels $ makeNbRandomsUnique seed nbColors $ length pixels - 1
+compress _    (CompressorConf 0        _     _     ) = []
+compress _    (CompressorConf _        _     []    ) = []
+compress seed (CompressorConf nbColors limit pixels) = linkPixelsToClusters pixels $ adjustClusters limit pixels $ extractFirstClustersPos pixels $ makeNbRandomsUnique seed nbColors $ length pixels - 1
 
-createFirstClustersPos :: [Pixel] -> [Int] -> [ClusterPos]
-createFirstClustersPos pixels idxs = createFirstClustersPos' 0 pixels $ sort idxs
 
-createFirstClustersPos' :: Int -> [Pixel] -> [Int] -> [ClusterPos]
-createFirstClustersPos' _   _                  []           = []
-createFirstClustersPos' _   []                 _            = []
-createFirstClustersPos' idx (Pixel _ col : ps) idxs@(x:xs)  | x == idx  = vector3itf col : createFirstClustersPos' (idx + 1) ps xs
-                                                            | otherwise = createFirstClustersPos' (idx + 1) ps idxs
+extractFirstClustersPos :: [Pixel] -> [Index] -> [ClusterPos]
+extractFirstClustersPos pixels idxs = extractFirstClustersPos' 0 pixels $ sort idxs
 
-generateClusters :: Float -> [Pixel] -> [ClusterPos] -> ([ClusterPos], [ClusterPos])
-generateClusters limit ps clusters = generateClusters' limit ps (clusters, clusters) [Vector3 (0, 0, 0)]
+extractFirstClustersPos' :: Index -> [Pixel] -> [Index] -> [ClusterPos]
+extractFirstClustersPos' _ _                  []              = []
+extractFirstClustersPos' _ []                 _               = []
+extractFirstClustersPos' i (Pixel _ col : ps) idxs@(idx : xs)
+                                                  | idx == i  = vector3itf col : extractFirstClustersPos' (i + 1) ps xs
+                                                  | otherwise = extractFirstClustersPos' (i + 1) ps idxs
 
-generateClusters' :: Float -> [Pixel] -> ([ClusterPos], [ClusterPos]) -> [Move3D] -> ([ClusterPos], [ClusterPos])
-generateClusters' _     _  res         []   = res
-generateClusters' limit ps (prevcs, _) move = let cs = appMove prevcs move in generateClusters' limit ps (cs, prevcs) $ filterMoves limit $ genMove cs $ genOneTime ps cs
+
+adjustClusters :: Float -> [Pixel] -> [ClusterPos] -> ([ClusterPos], [PrevClusterPos])
+adjustClusters limit ps clusters = adjustClusters' limit ps (clusters, clusters) [Vector3 (0, 0, 0)]
+
+adjustClusters' :: Float -> [Pixel] -> ([ClusterPos], [PrevClusterPos]) -> [Move3D] -> ([ClusterPos], [PrevClusterPos])
+adjustClusters' _     _  res         []   = res
+adjustClusters' limit ps (prevcs, _) move = let cs = applyMove prevcs move in adjustClusters' limit ps (cs, prevcs) $ filterMoves limit $ generateMoves cs $ generatePixelGroups ps cs
+
 
 filterMoves :: Float -> [Move3D] -> [Move3D]
 filterMoves limit moves = filterMoves' limit moves moves $ length moves
 
 filterMoves' :: Float -> [Move3D] -> [Move3D] -> Int -> [Move3D]
-filterMoves' _     _     []             0       = []
-filterMoves' _     moves _              0       = moves
-filterMoves' _     _     []             _       = []
+filterMoves' _     _     []             0     = []
+filterMoves' _     moves _              0     = moves
+filterMoves' _     _     []             _     = []
 filterMoves' limit moves mvs@(pos : ms) left
-                    | getVector3Length pos <= limit = filterMoves' limit moves ms  $ left - 1
-                    | otherwise                 = filterMoves' limit moves mvs $ left - 1
+              | getVector3Length pos <= limit = filterMoves' limit moves ms  $ left - 1
+              | otherwise                     = filterMoves' limit moves mvs $ left - 1
 
-genOneTime :: [Pixel] -> [ClusterPos] -> [(Int, ColorRGB)]
-genOneTime ps cs = genOneTime' ps cs $ generateEmptyTotals $ length cs
 
-genOneTime' :: [Pixel] -> [ClusterPos] -> [(Int, ColorRGB)] -> [(Int, ColorRGB)]
-genOneTime' []                 _  res    = res
-genOneTime' (Pixel _ col : ps) cs totals = genOneTime' ps cs $ insertCol totals col $ findIdx cs col
+generatePixelGroups :: [Pixel] -> [ClusterPos] -> [(Int, ColorRGB)]
+generatePixelGroups ps cs = generatePixelGroups' ps cs $ generateEmptyTotals $ length cs
+
+generatePixelGroups' :: [Pixel] -> [ClusterPos] -> [(Int, ColorRGB)] -> [(Int, ColorRGB)]
+generatePixelGroups' []                 _  res    = res
+generatePixelGroups' (Pixel _ col : ps) cs totals = generatePixelGroups' ps cs $ insertColor totals col $ findClosestCluster cs col
 
 generateEmptyTotals :: Int -> [(Int, ColorRGB)]
 generateEmptyTotals 0   = []
 generateEmptyTotals idx = (0, Vector3 (0, 0, 0)) : generateEmptyTotals (idx - 1)
 
-insertCol :: [(Int, ColorRGB)] -> ColorRGB -> Int -> [(Int, ColorRGB)]
-insertCol = insertCol' 0
 
-insertCol' :: Int -> [(Int, ColorRGB)] -> ColorRGB -> Int -> [(Int, ColorRGB)]
-insertCol' _ []                          _              _   = []
-insertCol' i (t@(nb, Vector3 (tx, ty, tz)) : ts) c@(Vector3 (cx, cy, cz)) idx
-                                                | i == idx  = (nb + 1, Vector3 (tx + cx, ty + cy, tz + cz)) : ts
-                                                | otherwise = t : insertCol' (i + 1) ts c idx
+insertColor :: [(Int, ColorRGB)] -> ColorRGB -> Index -> [(Int, ColorRGB)]
+insertColor = insertColor' 0
 
-linkPixelsToClusters :: [Pixel] -> ([ClusterPos], [ClusterPos]) -> [Cluster]
-linkPixelsToClusters ps (cs, prev) = foldr (\((cs, _), ps) acc -> Cluster (cs, ps) : acc) [] $ foldr (\p@(Pixel _ col) acc -> insertPixel acc p $ findIdx prev col) (zipWith (\c pr -> ((c, pr), [])) cs prev) ps
+insertColor' :: Index -> [(Int, ColorRGB)] -> ColorRGB -> Index -> [(Int, ColorRGB)]
+insertColor' _ []                                  _                        _   = []
+insertColor' i (t@(nb, Vector3 (tx, ty, tz)) : ts) c@(Vector3 (cx, cy, cz)) idx
+                                                                    | i == idx  = (nb + 1, Vector3 (tx + cx, ty + cy, tz + cz)) : ts
+                                                                    | otherwise = t : insertColor' (i + 1) ts c idx
+
+
+linkPixelsToClusters :: [Pixel] -> ([ClusterPos], [PrevClusterPos]) -> [Cluster]
+linkPixelsToClusters ps (cs, prev) = foldr (\((cs, _), ps) acc -> Cluster (cs, ps) : acc) [] $ foldr (\p@(Pixel _ col) acc -> insertPixel acc p $ findClosestCluster prev col) (zipWith (\c pr -> ((c, pr), [])) cs prev) ps
 
 insertPixel :: [((ClusterPos, ClusterPos), [Pixel])] -> Pixel -> Int -> [((ClusterPos, ClusterPos), [Pixel])]
 insertPixel = insertPixel' 0
@@ -92,7 +99,7 @@ insertPixel' i (r@(cs, ps) : rs) p idx  | i == idx  = (cs, p : ps) : rs
 
 
 -- computeCompression :: [Pixel] -> Float -> [(ClusterPos, [Pixel])]
--- computeCompression pixels limit = computeClusters pixels createFirstClustersPos limit
+-- computeCompression pixels limit = computeClusters pixels extractFirstClustersPos limit
 
 -- computeClusters :: [Pixel] -> [ClusterPos] -> [(ClusterPos), [Pixel]]
 -- computeClusters pixels clusters limit

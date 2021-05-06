@@ -11,23 +11,26 @@ import Vector.Vector
 import FileParsing.Pixel
 
 type Move3D     = Vector3 Float
+type Index = Int
 
 type ClusterPos = Vector3 Float
 newtype Cluster = Cluster (ClusterPos, [Pixel])
 instance Show Cluster where
     show (Cluster (pos, ps)) = "--\n" ++ show pos ++ "\n-" ++ concatMap (\p -> '\n' : show p) ps
+instance Eq Cluster where
+    (==) (Cluster (pos1, ps1)) (Cluster (pos2, ps2)) = pos1 == pos2 && ps1 == ps2
 
-appMove :: [ClusterPos] -> [Move3D] -> [ClusterPos]
-appMove []               _                   = []
-appMove cs               []                  = cs
-appMove (Vector3 (x, y, z) : cs) (Vector3 (mx, my, mz) : ms) = Vector3  (x + mx, y + my, z + mz) : appMove cs ms
+applyMove :: [ClusterPos] -> [Move3D] -> [ClusterPos]
+applyMove []               _                   = []
+applyMove cs               []                  = cs
+applyMove (Vector3 (x, y, z) : cs) (Vector3 (mx, my, mz) : ms) = Vector3  (x + mx, y + my, z + mz) : applyMove cs ms
 
-genMove :: [ClusterPos] -> [(Int, ColorRGB)] -> [Move3D]
-genMove = zipWith genMove'
+generateMoves :: [ClusterPos] -> [(Int, ColorRGB)] -> [Move3D]
+generateMoves = zipWith generateMoves'
 
-genMove' :: ClusterPos -> (Int, ColorRGB) -> Move3D
-genMove' _         (0,  _)            = Vector3 (0, 0, 0)
-genMove' (Vector3 (x, y, z)) (nb, Vector3 (cx, cy, cz)) = Vector3 ( cx `safeDivToFloat` nb - x
+generateMoves' :: ClusterPos -> (Int, ColorRGB) -> Move3D
+generateMoves' _                   (0,  _)            = Vector3 (0, 0, 0)
+generateMoves' (Vector3 (x, y, z)) (nb, Vector3 (cx, cy, cz)) = Vector3 ( cx `safeDivToFloat` nb - x
                                                             , cy `safeDivToFloat` nb - y
                                                             , cz `safeDivToFloat` nb - z)
 
@@ -35,12 +38,12 @@ safeDivToFloat :: Int -> Int -> Float
 safeDivToFloat _ 0 = 0
 safeDivToFloat a b = fromIntegral a / fromIntegral b
 
-findIdx :: [ClusterPos] -> ColorRGB -> Int
-findIdx []     _   = -1
-findIdx (c:cs) col = findIdx' col 1 cs c 0 $ getVector3Distance c $ vector3itf col
+findClosestCluster :: [ClusterPos] -> ColorRGB -> Index
+findClosestCluster []     _   = -1
+findClosestCluster (c:cs) col = findClosestCluster' col 1 cs c 0 $ getVector3Distance c $ vector3itf col
 
-findIdx' :: ColorRGB -> Int -> [ClusterPos] -> ClusterPos -> Int -> Float -> Int
-findIdx' _   _ []     _    idx     _                       = idx
-findIdx' col i (c:cs) best bestIdx bestDist
-        | getVector3Distance c (vector3itf col) < bestDist = findIdx' col (i + 1) cs c i $ getVector3Distance c $ vector3itf col
-        | otherwise                                        = findIdx' col (i + 1) cs best bestIdx bestDist
+findClosestCluster' :: ColorRGB -> Index -> [ClusterPos] -> ClusterPos -> Index -> Float -> Index
+findClosestCluster' _   _ []     _    idx     _            = idx
+findClosestCluster' col i (c:cs) best bestIdx bestDist
+        | getVector3Distance c (vector3itf col) < bestDist = findClosestCluster' col (i + 1) cs c i $ getVector3Distance c $ vector3itf col
+        | otherwise                                        = findClosestCluster' col (i + 1) cs best bestIdx bestDist
