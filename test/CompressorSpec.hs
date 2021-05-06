@@ -61,7 +61,7 @@ spec = do
                                 `shouldBe` [((Vector3 (33.0,18.0,109.0), Vector3 (0, 0, 0)), []), ((Vector3 (34.166668,23.5,111.0), Vector3 (0, 0, 0)), [Pixel (Vector2 (0, 0)) (Vector3 (33, 21, 109))])]
 
     it "linkPixelsToClusters" $ linkPixelsToClusters pixels ([Vector3 (34.125, 19.5, 109.75), Vector3 (33, 28.5, 112)], [Vector3 (33, 21, 112), Vector3 (33, 25, 112)]) `shouldBe` [
-            Cluster (Vector3 (34.125, 19.5, 109.75),
+            Cluster (Vector3 (34.125, 19.5, 109.75))
             [
                 Pixel (Vector2 (0, 0)) (Vector3 (33, 18, 109)),
                 Pixel (Vector2 (0, 1)) (Vector3 (33, 18, 109)),
@@ -71,19 +71,19 @@ spec = do
                 Pixel (Vector2 (1, 1)) (Vector3 (35, 18, 109)),
                 Pixel (Vector2 (1, 2)) (Vector3 (35, 21, 109)),
                 Pixel (Vector2 (1, 3)) (Vector3 (38, 21, 112))
-            ]),
-            Cluster (Vector3 (33, 28.5, 112),
+            ],
+            Cluster (Vector3 (33, 28.5, 112))
             [
                 Pixel (Vector2 (0, 4)) (Vector3 (33, 25, 112)),
                 Pixel (Vector2 (0, 5)) (Vector3 (33, 32, 112))
-            ])
+            ]
         ]
     it "linkPixelsToClusters" $ linkPixelsToClusters pixels ([Vector3 (33, 32, 112), Vector3 (34, 20.11111, 110)], [Vector3 (33, 32, 112), Vector3 (35, 21, 109)]) `shouldBe` [
-            Cluster (Vector3 (33.0,32.0,112.0),
+            Cluster (Vector3 (33.0,32.0,112.0))
             [
                 Pixel (Vector2 (0, 5)) (Vector3 (33, 32, 112))
-            ]),
-            Cluster (Vector3 (34.0,20.11111,110.0),
+            ],
+            Cluster (Vector3 (34.0,20.11111,110.0))
             [
                 Pixel (Vector2 (0, 0)) (Vector3 (33, 18, 109)),
                 Pixel (Vector2 (0, 1)) (Vector3 (33, 18, 109)),
@@ -94,7 +94,7 @@ spec = do
                 Pixel (Vector2 (1, 1)) (Vector3 (35, 18, 109)),
                 Pixel (Vector2 (1, 2)) (Vector3 (35, 21, 109)),
                 Pixel (Vector2 (1, 3)) (Vector3 (38, 21, 112))
-            ])
+            ]
         ]
 
     it "safeDivToFloat" $ safeDivToFloat 2 0 `shouldBe` 0
@@ -203,14 +203,14 @@ spec = do
     it "compress" $ compress seed (CompressorConf 0 0.8 pixels) `shouldBe` []
     it "compress" $ compress seed (CompressorConf 2 0.8 []    ) `shouldBe` []
     it "compress" $ compress seed (CompressorConf 2 0.8 pixels) `shouldBe` [
-            Cluster (Vector3 (33.5, 18, 109),
+            Cluster (Vector3 (33.5, 18, 109))
             [
                 Pixel (Vector2 (0, 0)) (Vector3 (33, 18, 109)),
                 Pixel (Vector2 (0, 1)) (Vector3 (33, 18, 109)),
                 Pixel (Vector2 (1, 0)) (Vector3 (33, 18, 109)),
                 Pixel (Vector2 (1, 1)) (Vector3 (35, 18, 109))
-            ]),
-            Cluster (Vector3 (34.166668, 23.5, 111),
+            ],
+            Cluster (Vector3 (34.166668, 23.5, 111))
             [
                 Pixel (Vector2 (0, 2)) (Vector3 (33, 21, 109)),
                 Pixel (Vector2 (0, 3)) (Vector3 (33, 21, 112)),
@@ -218,5 +218,5 @@ spec = do
                 Pixel (Vector2 (0, 5)) (Vector3 (33, 32, 112)),
                 Pixel (Vector2 (1, 2)) (Vector3 (35, 21, 109)),
                 Pixel (Vector2 (1, 3)) (Vector3 (38, 21, 112))
-            ])
+            ]
         ]

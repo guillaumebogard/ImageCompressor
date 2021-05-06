@@ -80,7 +80,7 @@ insertColor' i (t@(nb, Vector3 (tx, ty, tz)) : ts) c@(Vector3 (cx, cy, cz)) idx
 
 
 linkPixelsToClusters :: [Pixel] -> ([ClusterPos], [PrevClusterPos]) -> [Cluster]
-linkPixelsToClusters ps (cs, prev) = foldr (\((cs, _), ps) acc -> Cluster (cs, ps) : acc) [] $ foldr (\p@(Pixel _ col) acc -> insertPixel acc p $ findClosestCluster prev col) (zipWith (\c pr -> ((c, pr), [])) cs prev) ps
+linkPixelsToClusters ps (cs, prev) = foldr (\((cs, _), ps) acc -> Cluster cs ps : acc) [] $ foldr (\p@(Pixel _ col) acc -> insertPixel acc p $ findClosestCluster prev col) (zipWith (\c pr -> ((c, pr), [])) cs prev) ps
 
 insertPixel :: [((ClusterPos, ClusterPos), [Pixel])] -> Pixel -> Int -> [((ClusterPos, ClusterPos), [Pixel])]
 insertPixel = insertPixel' 0
