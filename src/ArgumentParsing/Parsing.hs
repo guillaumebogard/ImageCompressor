@@ -5,18 +5,13 @@
 -- Parsing
 --
 
-module Parsing ( NumberColors
-               , NumberLimit
-               , StringFilepath
-               , Conf(..)
-               , parseArgs
-               ) where
+module ArgumentParsing.Parsing where
 
-import Control.Exception    ( throw )
-import Text.Read            ( readMaybe )
-import Errors               ( MyError(..) )
+import Control.Exception ( throw )
+import Text.Read ( readMaybe )
 
-data TOKEN = COLORS | LIMIT | FILEPATH | Value String
+import Errors ( CompressorError(..) )
+import ArgumentParsing.Lexing ( TOKEN(..), tokenize )
 
 type NumberColors   = Int
 type NumberLimit    = Float
@@ -27,13 +22,6 @@ data Conf           = Conf         NumberColors         NumberLimit         Stri
 
 parseArgs :: [String] -> Conf
 parseArgs args = finalConfCheck $ parsing (ParsingConf Nothing Nothing Nothing) $ tokenize args
-
-tokenize :: [String] -> [TOKEN]
-tokenize [] = []
-tokenize ("-n":xs) = COLORS : tokenize xs
-tokenize ("-l":xs) = LIMIT : tokenize xs
-tokenize ("-f":xs) = FILEPATH : tokenize xs
-tokenize (x:xs)    = Value x : tokenize xs
 
 parsing :: ParsingConf -> [TOKEN] -> ParsingConf
 parsing parsingConf []                            = parsingConf

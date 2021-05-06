@@ -7,13 +7,12 @@
 
 module CompressorConf ( getCompressorConf, CompressorConf(..) ) where
 
-import Parsing              ( Conf(..)
+import ArgumentParsing.Parsing              ( Conf(..)
                             , NumberColors
                             , NumberLimit
                             )
-import CreatePixel          ( Pixel
-                            , createPixel
-                            )
+import FileParsing.CreatePixel
+import FileParsing.Pixel
 
 data CompressorConf = CompressorConf NumberColors NumberLimit [Pixel]
 

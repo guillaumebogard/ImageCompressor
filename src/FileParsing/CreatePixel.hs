@@ -5,46 +5,28 @@
 -- CreatePixel
 --
 
-module CreatePixel ( Pixel(..)
-                   , ColorRGB
-                   , createPixel
-                   ) where
+module FileParsing.CreatePixel where
 
 import Text.Read            ( readMaybe )
 import Control.Exception    ( throw )
-import Errors               ( MyError(..) )
+
+import Errors               ( CompressorError(..) )
+import FileParsing.PixelLexing
+import FileParsing.Pixel
+import Vector.Vector
 
 type PosX     = Int
 type PosY     = Int
 type Pos2D    = (PosX, PosY)
 
-type ColorR   = Int
-type ColorG   = Int
-type ColorB   = Int
-type ColorRGB = (ColorR, ColorG, ColorB)
-
-data Pixel = Pixel Pos2D ColorRGB
-instance Show Pixel where
-    show (Pixel pos color) = show pos ++ ' ' : show color
-instance Eq Pixel where
-    (==) (Pixel (xa, ya) (ra, ga, ba)) (Pixel (xb, yb) (rb, gb, bb)) = ra == rb && ga == gb && ba == bb && xa == xb && ya == yb
-
 data ParsingPixel = ParsingPixel (Maybe PosX, Maybe PosY) (Maybe ColorR, Maybe ColorG, Maybe ColorB)
-
-data Token = Splitter Char | Number String
 
 createPixel :: String -> Pixel
 createPixel str = finalPixelCheck $ parsing $ foldr tokenize [] str
 
-tokenize :: Char -> [Token] -> [Token]
-tokenize '(' t             = Splitter '('   : t
-tokenize ')' t             = Splitter ')'   : t
-tokenize ' ' t             = Splitter ' '   : t
-tokenize ',' t             = Splitter ','   : t
-tokenize x   (Number a:ts) = Number (x : a) : ts
-tokenize x   t             = Number [x]     : t
+-- make a package to include different steps of the createPixel process.
 
-parsing :: [Token] -> ParsingPixel
+parsing :: [TOKEN] -> ParsingPixel
 parsing [Splitter '(', Number x, Splitter ',', Number y, Splitter ')', Splitter ' ', Splitter '(', Number r, Splitter ',', Number g, Splitter ',', Number b, Splitter ')']
            = ParsingPixel (readMaybe x, readMaybe y) (readMaybe r, readMaybe g, readMaybe b)
 parsing _  = throw FileParse
@@ -56,7 +38,14 @@ finalPixelCheck (ParsingPixel (_      , _      ) (Nothing, _      , _      )) = 
 finalPixelCheck (ParsingPixel (_      , _      ) (_      , Nothing, _      )) = throw FileParse
 finalPixelCheck (ParsingPixel (_      , _      ) (_      , _      , Nothing)) = throw FileParse
 finalPixelCheck (ParsingPixel (Just x , Just y ) (Just r , Just g , Just b ))
-        | r < 0 || r > 255 = throw FileParseColorError
-        | g < 0 || g > 255 = throw FileParseColorError
-        | b < 0 || b > 255 = throw FileParseColorError
-        | otherwise        = Pixel (x, y) (r, g, b)
+        | isValidColor (Vector3 (r, g, b)) = Pixel (Vector2 (x, y)) $ Vector3 (r, g, b)
+        | otherwise              = throw FileParseColorError
+
+-- use isValidColor to check if a pixel whether be instantiated or not, if isValidColor false, throw FileParseColorError
+
+isValidColor :: ColorRGB -> Bool
+isValidColor (Vector3 (r, g, b))
+        | r < 0 || r > 255 = False
+        | g < 0 || g > 255 = False
+        | b < 0 || b > 255 = False
+        | otherwise        = True
