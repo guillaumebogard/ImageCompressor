@@ -9,12 +9,15 @@ module FileParsing.Pixel where
 
 import Vector.Vector
 
-type ColorR = Int
-type ColorG = Int
-type ColorB = Int
-type ColorRGB = Vector3 Int
+type ColorUnit = Int
+type ColorR    = ColorUnit
+type ColorG    = ColorUnit
+type ColorB    = ColorUnit
+type ColorRGB  = Vector3 ColorUnit
 
-data Pixel = Pixel (Vector2 Int) ColorRGB
+type PixelPos  = Vector2 Int
+
+data Pixel = Pixel PixelPos ColorRGB
 instance Show Pixel where
     show (Pixel pos color) = show pos ++ ' ' : show color
 instance Eq Pixel where

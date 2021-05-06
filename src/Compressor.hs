@@ -35,7 +35,7 @@ createFirstClustersPos' idx (Pixel _ col : ps) idxs@(x:xs)  | x == idx  = vector
                                                             | otherwise = createFirstClustersPos' (idx + 1) ps idxs
 
 generateClusters :: Float -> [Pixel] -> [ClusterPos] -> ([ClusterPos], [ClusterPos])
-generateClusters limit ps clusters = generateClusters' limit ps (clusters, clusters) [(0, 0, 0)]
+generateClusters limit ps clusters = generateClusters' limit ps (clusters, clusters) [Vector3 (0, 0, 0)]
 
 generateClusters' :: Float -> [Pixel] -> ([ClusterPos], [ClusterPos]) -> [Move3D] -> ([ClusterPos], [ClusterPos])
 generateClusters' _     _  res         []   = res
@@ -49,7 +49,7 @@ filterMoves' _     _     []             0       = []
 filterMoves' _     moves _              0       = moves
 filterMoves' _     _     []             _       = []
 filterMoves' limit moves mvs@(pos : ms) left
-                    | getVector3Length (Vector3 pos) <= limit = filterMoves' limit moves ms  $ left - 1
+                    | getVector3Length pos <= limit = filterMoves' limit moves ms  $ left - 1
                     | otherwise                 = filterMoves' limit moves mvs $ left - 1
 
 genOneTime :: [Pixel] -> [ClusterPos] -> [(Int, ColorRGB)]
@@ -73,12 +73,12 @@ insertCol' i (t@(nb, Vector3 (tx, ty, tz)) : ts) c@(Vector3 (cx, cy, cz)) idx
                                                 | otherwise = t : insertCol' (i + 1) ts c idx
 
 linkPixelsToClusters :: [Pixel] -> ([ClusterPos], [ClusterPos]) -> [Cluster]
-linkPixelsToClusters ps (cs, prev) = foldr (\p@(Pixel _ col) acc -> insertPixel acc p $ findIdx prev col) (zipWith (\c pr -> ((c, pr), [])) cs prev) ps
+linkPixelsToClusters ps (cs, prev) = foldr (\((cs, _), ps) acc -> Cluster (cs, ps) : acc) [] $ foldr (\p@(Pixel _ col) acc -> insertPixel acc p $ findIdx prev col) (zipWith (\c pr -> ((c, pr), [])) cs prev) ps
 
-insertPixel :: [Cluster] -> Pixel -> Int -> [Cluster]
+insertPixel :: [((ClusterPos, ClusterPos), [Pixel])] -> Pixel -> Int -> [((ClusterPos, ClusterPos), [Pixel])]
 insertPixel = insertPixel' 0
 
-insertPixel' :: Int -> [Cluster] -> Pixel -> Int -> [Cluster]
+insertPixel' :: Int -> [((ClusterPos, ClusterPos), [Pixel])] -> Pixel -> Int -> [((ClusterPos, ClusterPos), [Pixel])]
 insertPixel' _ []                _ _    = []
 insertPixel' i (r@(cs, ps) : rs) p idx  | i == idx  = (cs, p : ps) : rs
                                         | otherwise = r : insertPixel' (i + 1) rs p idx

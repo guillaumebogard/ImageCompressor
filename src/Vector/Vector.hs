@@ -6,13 +6,6 @@
 --
 
 module Vector.Vector where
--- module Vector.Vector   (  Pos2D
---                         , Pos3D
---                         , Vector(..)
---                         , getVectorDistance
---                         , getVectorLength
---                         , vectoritf
---                         ) where
 
 newtype Vector2 a = Vector2 (a, a)
 instance Show a => Show (Vector2 a) where
@@ -25,9 +18,6 @@ instance Show a => Show (Vector3 a) where
     show (Vector3 (x, y, z)) = '(' : show x ++ ',' : ' ' : show y ++ ',' : ' ' : show z ++ ")"
 instance Eq a => Eq (Vector3 a) where
     (==) (Vector3 (xa, ya, za)) (Vector3 (xb, yb, zb)) = xa == xb && ya == yb
-
-type Pos2D = (Float, Float)
-type Pos3D = (Float, Float, Float)
 
 getVector2Distance :: Floating a => Vector2 a -> Vector2 a -> a
 getVector2Distance (Vector2 (x1, y1)) (Vector2 (x2, y2)) = sqrt ((x1 - x2) ^ (2 :: Integer) + (y1 - y2) ^ (2 :: Integer))

@@ -18,20 +18,24 @@ import System.Random
 
 import Compressor
 import CompressorConf
-import CreatePixel
+import FileParsing.CreatePixel
+import FileParsing.Pixel
+import Cluster.Cluster
+import Vector.Vector
+import RandomManager
 
 spec :: Spec
 spec = do
-    let pixels = [   Pixel (0, 0) (33, 18, 109) -- 0 A
-                   , Pixel (0, 1) (33, 18, 109) -- 1 B
-                   , Pixel (0, 2) (33, 21, 109) -- 2 C
-                   , Pixel (0, 3) (33, 21, 112) -- 3 D
-                   , Pixel (0, 4) (33, 25, 112) -- 4 E
-                   , Pixel (0, 5) (33, 32, 112) -- 5 F
-                   , Pixel (1, 0) (33, 18, 109) -- 6 G
-                   , Pixel (1, 1) (35, 18, 109) -- 7 H
-                   , Pixel (1, 2) (35, 21, 109) -- 8 I
-                   , Pixel (1, 3) (38, 21, 112) -- 9 J
+    let pixels = [   Pixel (Vector2 (0, 0)) (Vector3 (33, 18, 109)) -- 0 A
+                   , Pixel (Vector2 (0, 1)) (Vector3 (33, 18, 109)) -- 1 B
+                   , Pixel (Vector2 (0, 2)) (Vector3 (33, 21, 109)) -- 2 C
+                   , Pixel (Vector2 (0, 3)) (Vector3 (33, 21, 112)) -- 3 D
+                   , Pixel (Vector2 (0, 4)) (Vector3 (33, 25, 112)) -- 4 E
+                   , Pixel (Vector2 (0, 5)) (Vector3 (33, 32, 112)) -- 5 F
+                   , Pixel (Vector2 (1, 0)) (Vector3 (33, 18, 109)) -- 6 G
+                   , Pixel (Vector2 (1, 1)) (Vector3 (35, 18, 109)) -- 7 H
+                   , Pixel (Vector2 (1, 2)) (Vector3 (35, 21, 109)) -- 8 I
+                   , Pixel (Vector2 (1, 3)) (Vector3 (38, 21, 112)) -- 9 J
                  ]
     let seed = mkStdGen 230844504580
 

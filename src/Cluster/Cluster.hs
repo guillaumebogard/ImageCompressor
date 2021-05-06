@@ -10,24 +10,24 @@ module Cluster.Cluster where
 import Vector.Vector
 import FileParsing.Pixel
 
---data Cluster = Cluster (Float, Float, Float) deriving Show
-
-type Move3D     = (Float, Float, Float)
+type Move3D     = Vector3 Float
 
 type ClusterPos = Vector3 Float
-type Cluster    = ((ClusterPos, ClusterPos), [Pixel]) -- make data, deriving show for cluster printing
+newtype Cluster = Cluster (ClusterPos, [Pixel])
+instance Show Cluster where
+    show (Cluster (pos, ps)) = "--\n" ++ show pos ++ "\n-" ++ concatMap (\p -> '\n' : show p) ps
 
 appMove :: [ClusterPos] -> [Move3D] -> [ClusterPos]
 appMove []               _                   = []
 appMove cs               []                  = cs
-appMove (Vector3 (x, y, z) : cs) ((mx, my, mz) : ms) = Vector3  (x + mx, y + my, z + mz) : appMove cs ms
+appMove (Vector3 (x, y, z) : cs) (Vector3 (mx, my, mz) : ms) = Vector3  (x + mx, y + my, z + mz) : appMove cs ms
 
 genMove :: [ClusterPos] -> [(Int, ColorRGB)] -> [Move3D]
 genMove = zipWith genMove'
 
 genMove' :: ClusterPos -> (Int, ColorRGB) -> Move3D
-genMove' _         (0,  _)            = (0, 0, 0)
-genMove' (Vector3 (x, y, z)) (nb, Vector3 (cx, cy, cz)) = ( cx `safeDivToFloat` nb - x
+genMove' _         (0,  _)            = Vector3 (0, 0, 0)
+genMove' (Vector3 (x, y, z)) (nb, Vector3 (cx, cy, cz)) = Vector3 ( cx `safeDivToFloat` nb - x
                                                             , cy `safeDivToFloat` nb - y
                                                             , cz `safeDivToFloat` nb - z)
 

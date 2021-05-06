@@ -18,7 +18,7 @@ import Errors               ( CompressorError(ArgumentError
                                              , FileParseColorError
                                              )
                             )
-import Usage                ( printUsage )
+import Usage
 import CompressorConf       ( getCompressorConf )
 import ArgumentParsing.Parsing
 import Compressor
@@ -28,19 +28,16 @@ import Vector.Vector
 main :: IO ()
 main = handle
         handleErrors
-        (getArgs >>= launchApp)
+        (getArgs >>= launchApp . parseArgs)
 
-launchApp :: [String] -> IO ()
-launchApp []         = printUsage
-launchApp ["-h"]     = printUsage
-launchApp ["-help"]  = printUsage
-launchApp ["--help"] = printUsage
-launchApp args       = let conf@(Conf _ _ filePath) = parseArgs args in readLines filePath >>= (\fileContent -> newStdGen >>= (\seed -> printClusters $ compress seed $ getCompressorConf conf fileContent))
+launchApp :: Either String Conf -> IO ()
+launchApp (Left str)                       = putStrLn str
+launchApp (Right conf@(Conf _ _ filePath)) = readLines filePath >>= (\fileContent -> newStdGen >>= (\seed -> printClusters $ compress seed $ getCompressorConf conf fileContent))
 -- launchApp args       = let conf@(Conf _ _ filePath) = parseArgs args in readLines filePath >>= print . compress (mkStdGen 230844504580) . getCompressorConf conf
 -- launchApp args       = let conf@(Conf _ _ filePath) = parseArgs args in readLines filePath >>= print . getCompressorConf conf
 
 printClusters :: [Cluster] -> IO ()
-printClusters = mapM_ (\((pos, _), ps) -> putStrLn "--" >> print (vector3fti pos) >> putStrLn "-" >> mapM_ print ps) -- use show
+printClusters = mapM_ print
 
 readLines :: String -> IO [String]
 readLines = fmap lines . readFile 
