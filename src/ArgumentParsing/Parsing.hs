@@ -34,7 +34,7 @@ parseArgs args = finalConfCheck $ parsing (ParsingConf Nothing Nothing Nothing) 
 
 parsing :: ParsingConf -> [TOKEN] -> Either String ParsingConf
 parsing parsingConf []                            = Right   parsingConf
-parsing parsingConf (HELP     : xs)               = Left    usage
+parsing _           (HELP     :               _ ) = Left    usage
 parsing parsingConf (COLORS   : (Value val) : xs) = parsing (setColors   parsingConf val) xs
 parsing parsingConf (LIMIT    : (Value val) : xs) = parsing (setLimit    parsingConf val) xs
 parsing parsingConf (FILEPATH : (Value val) : xs) = parsing (setFilepath parsingConf val) xs

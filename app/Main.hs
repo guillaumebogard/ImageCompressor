@@ -9,14 +9,14 @@ module Main ( main ) where
 
 import Control.Exception    ( handle )
 import System.Exit          ( ExitCode(ExitFailure)
-                            , exitWith )
+                            , exitWith
+                            )
 import System.Environment   ( getArgs )
 import System.Random        ( newStdGen )
 
 import Errors               ( CompressorError(ArgumentError
                                              , FileParse
-                                             , FileParseColorError)
-                            )
+                                             , FileParseColorError))
 import CompressorConf       ( getCompressorConf )
 import ArgumentParsing.Parsing ( parseArgs, Conf(..) )
 import Compressor ( compress )
