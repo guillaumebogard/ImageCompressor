@@ -9,13 +9,13 @@ module Vector.Vector where
 
 newtype Vector2 a = Vector2 (a, a)
 instance Show a => Show (Vector2 a) where
-    show (Vector2 (x, y))    = '(' : show x ++ ',' : ' ' : show y ++ ")"
+    show (Vector2 (x, y))    = '(' : show x ++ ',' : show y ++ ")"
 instance Eq a => Eq (Vector2 a) where
     (==) (Vector2 (x1, y1))     (Vector2 (x2, y2))     = x1 == x2 && y1 == y2
 
 newtype Vector3 a = Vector3 (a, a, a)
 instance Show a => Show (Vector3 a) where
-    show (Vector3 (x, y, z)) = '(' : show x ++ ',' : ' ' : show y ++ ',' : ' ' : show z ++ ")"
+    show (Vector3 (x, y, z)) = '(' : show x ++ ',' : show y ++ ',' : show z ++ ")"
 instance Eq a => Eq (Vector3 a) where
     (==) (Vector3 (x1, y1, z1)) (Vector3 (x2, y2, z2)) = x1 == x2 && y1 == y2 && z1 == z2
 

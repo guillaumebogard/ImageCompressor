@@ -11,12 +11,12 @@ import Vector.Vector
 import FileParsing.Pixel
 
 type Move3D     = Vector3 Float
-type Index = Int
+type Index      = Int
 
 type ClusterPos = Vector3 Float
 data Cluster = Cluster ClusterPos [Pixel]
 instance Show Cluster where
-    show (Cluster pos ps) = "--\n" ++ show pos ++ "\n-" ++ concatMap (\p -> '\n' : show p) ps
+    show (Cluster pos ps) = "--\n" ++ show (vector3fti pos) ++ "\n-" ++ concatMap (\p -> '\n' : show p) ps
 instance Eq Cluster where
     (==) (Cluster pos1 ps1) (Cluster pos2 ps2) = pos1 == pos2 && ps1 == ps2
 
