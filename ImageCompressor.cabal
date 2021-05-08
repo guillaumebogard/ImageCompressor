@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.33.0.
+-- This file has been generated from package.yaml by hpack version 0.34.4.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 6e7e99bd91cb6a2fbea7f040b325e44d00bcd156afba33d256e1ddebf1005a5e
+-- hash: 2fc1e0e664ee68b02d09f1b706c61bfe3aaf408ed4542fe084f3aac3db837fff
 
 name:           ImageCompressor
 version:        0.1.0.0
@@ -36,7 +36,6 @@ library
       FileParsing.CreatePixel
       FileParsing.Pixel
       FileParsing.PixelLexing
-      FileParsing.PixelParsing
       RandomManager
       Usage
       Vector.Vector

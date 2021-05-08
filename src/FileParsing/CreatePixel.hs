@@ -32,11 +32,11 @@ finalPixelCheck (ParsingPixel (_      , _      ) (Nothing, _      , _      )) = 
 finalPixelCheck (ParsingPixel (_      , _      ) (_      , Nothing, _      )) = throw FileParse
 finalPixelCheck (ParsingPixel (_      , _      ) (_      , _      , Nothing)) = throw FileParse
 finalPixelCheck (ParsingPixel (Just x , Just y ) (Just r , Just g , Just b ))
-        | isValidColor (Vector3 (r, g, b)) = Pixel (Vector2 (x, y)) $ Vector3 (r, g, b)
+        | isValidColor (Vector3 r g b) = Pixel (Vector2 x y) $ Vector3 r g b
         | otherwise                        = throw FileParseColorError
 
 isValidColor :: ColorRGB -> Bool
-isValidColor (Vector3 (r, g, b))
+isValidColor (Vector3 r g b)
         | r < 0 || r > 255 = False
         | g < 0 || g > 255 = False
         | b < 0 || b > 255 = False
