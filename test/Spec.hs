@@ -5,11 +5,11 @@
 -- Spec
 --
 
-module Main (main) where
+module Main           ( main ) where
 
-import Test.Hspec   ( hspec
-                    , Spec
-                    , describe)
+import Test.Hspec     ( hspec
+                      , Spec
+                      , describe)
 
 import CompressorSpec ( spec )
 
