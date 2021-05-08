@@ -7,15 +7,24 @@
 
 module Compressor where
 
-import Data.List ( sort, nub )
-import System.Random ( randomR, RandomGen )
+import Data.List         ( sort
+                         , nub )
+import System.Random     ( randomR
+                         , RandomGen )
 
-import CompressorConf ( CompressorConf(..) )
-import FileParsing.CreatePixel
-import FileParsing.Pixel
-import RandomManager ( makeNbRandomsUnique )
-import Vector.Vector
-import Cluster.Cluster
+import CompressorConf    ( CompressorConf(..) )
+import FileParsing.Pixel ( ColorRGB, Pixel(..) )
+import RandomManager     ( makeNbRandomsUnique )
+import Vector.Vector     ( Vector3(..)
+                         , getLengthVector3
+                         , vector3itn )
+import Cluster.Cluster   ( Move3D
+                         , ClusterPos
+                         , Cluster(..)
+                         , Index
+                         , applyMove
+                         , generateMoves
+                         , findClosestCluster )
 
 type PrevClusterPos = ClusterPos
 
@@ -48,9 +57,9 @@ filterMoves :: Float -> [Move3D] -> [Move3D]
 filterMoves limit moves = filterMoves' limit moves moves $ length moves
 
 filterMoves' :: Float -> [Move3D] -> [Move3D] -> Int -> [Move3D]
-filterMoves' _     _     []             0     = []
-filterMoves' _     moves _              0     = moves
-filterMoves' _     _     []             _     = []
+filterMoves' _     _     []             0    = []
+filterMoves' _     moves _              0    = moves
+filterMoves' _     _     []             _    = []
 filterMoves' limit moves mvs@(pos : ms) left
     | getLengthVector3 pos <= limit = filterMoves' limit moves ms  $ left - 1
     | otherwise                     = filterMoves' limit moves mvs $ left - 1

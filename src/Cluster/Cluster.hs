@@ -5,15 +5,26 @@
 -- Cluster
 --
 
-module Cluster.Cluster where
+module Cluster.Cluster   ( Move3D
+                         , ClusterPos
+                         , Cluster(..)
+                         , Index
+                         , applyMove
+                         , generateMoves
+                         , findClosestCluster
+                         ) where
 
-import Vector.Vector
-import FileParsing.Pixel
+import Vector.Vector     ( Vector3(..)
+                         , vector3fti
+                         , getDistanceVector3
+                         , vector3itn )
+import FileParsing.Pixel ( ColorRGB
+                         , Pixel )
 
 type Move3D     = Vector3 Float
 type Index      = Int
-
 type ClusterPos = Vector3 Float
+
 data Cluster    = Cluster ClusterPos [Pixel]
 instance Show Cluster where
     show (Cluster pos ps) = "--\n" ++ show (vector3fti pos) ++ "\n-" ++ concatMap (\p -> '\n' : show p) ps

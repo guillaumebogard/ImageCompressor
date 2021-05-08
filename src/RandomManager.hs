@@ -9,9 +9,9 @@ module RandomManager ( makeNbRandomsUnique
                      , makeNbRandoms
                      ) where
 
-import System.Random ( randomR, RandomGen )
-import Data.List ( nub )
-
+import System.Random ( randomR
+                     , RandomGen )
+import Data.List     ( nub )
 
 makeNbRandomsUnique :: (RandomGen a) => a -> Int -> Int -> [Int]
 makeNbRandomsUnique seed nbLeft maxValue = makeNbRandomsUnique' seed nbLeft maxValue []

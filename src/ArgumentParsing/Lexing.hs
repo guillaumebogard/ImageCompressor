@@ -5,7 +5,9 @@
 -- Lexing
 --
 
-module ArgumentParsing.Lexing where
+module ArgumentParsing.Lexing ( TOKEN (..)
+                              , tokenize
+                              ) where
 
 data TOKEN = HELP | COLORS | LIMIT | FILEPATH | Value String
 

@@ -5,14 +5,15 @@
 -- CompressorConf
 --
 
-module CompressorConf ( getCompressorConf, CompressorConf(..) ) where
+module CompressorConf          ( getCompressorConf
+                               , CompressorConf(..)
+                               ) where
 
-import ArgumentParsing.Parsing              ( Conf(..)
-                            , NumberColors
-                            , NumberLimit
-                            )
-import FileParsing.CreatePixel
-import FileParsing.Pixel
+import ArgumentParsing.Parsing ( Conf(..)
+                               , NumberColors
+                               , NumberLimit )
+import FileParsing.CreatePixel ( createPixel )
+import FileParsing.Pixel       ( Pixel )
 
 data CompressorConf = CompressorConf NumberColors NumberLimit [Pixel]
 

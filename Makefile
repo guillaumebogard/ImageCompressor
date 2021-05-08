@@ -14,7 +14,7 @@ STACK_NAME		=	ImageCompressor
 NAME			=	imageCompressor
 
 all:
-	stack build
+	stack build --pedantic
 	cp $(BINARY_PATH)/bin/$(STACK_NAME)-exe ./$(NAME)
 .PHONY:	all
 

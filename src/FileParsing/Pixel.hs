@@ -5,9 +5,14 @@
 -- Pixel
 --
 
-module FileParsing.Pixel where
+module FileParsing.Pixel ( ColorRGB
+                         , Pixel(..)
+                         , ColorR
+                         , ColorB
+                         , ColorG
+                         ) where
 
-import Vector.Vector
+import Vector.Vector     ( Vector2, Vector3(..) )
 
 type ColorUnit = Int
 type ColorR    = ColorUnit

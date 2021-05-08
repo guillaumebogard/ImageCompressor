@@ -5,11 +5,11 @@
 -- Errors
 --
 
-module Errors ( CompressorError (..) ) where
+module Errors            ( CompressorError (..) ) where
 
 import Control.Exception ( Exception )
 
 data CompressorError = ArgumentError String | FileParse | FileParseColorError
-                deriving (Show, Eq)
+    deriving (Show, Eq)
 
 instance Exception CompressorError

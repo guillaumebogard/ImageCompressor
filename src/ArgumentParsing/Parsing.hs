@@ -5,14 +5,21 @@
 -- Parsing
 --
 
-module ArgumentParsing.Parsing where
+module ArgumentParsing.Parsing ( Conf(..)
+                               , NumberColors
+                               , NumberLimit
+                               , StringFilepath
+                               , parseArgs
+                               ) where
 
-import Control.Exception ( throw )
-import Text.Read ( readMaybe )
+import Control.Exception      ( throw )
+import Text.Read              ( readMaybe )
 
-import Errors ( CompressorError(..) )
-import ArgumentParsing.Lexing ( TOKEN(..), tokenize )
-import Usage
+import Errors                 ( CompressorError(..) )
+import ArgumentParsing.Lexing ( TOKEN(..)
+                              , tokenize
+                              )
+import Usage ( usage )
 
 type NumberColors   = Int
 type NumberLimit    = Float
@@ -26,7 +33,7 @@ parseArgs []   = Left usage
 parseArgs args = finalConfCheck $ parsing (ParsingConf Nothing Nothing Nothing) $ tokenize args
 
 parsing :: ParsingConf -> [TOKEN] -> Either String ParsingConf
-parsing parsingConf []                            = Right $ parsingConf
+parsing parsingConf []                            = Right   parsingConf
 parsing parsingConf (HELP     : xs)               = Left    usage
 parsing parsingConf (COLORS   : (Value val) : xs) = parsing (setColors   parsingConf val) xs
 parsing parsingConf (LIMIT    : (Value val) : xs) = parsing (setLimit    parsingConf val) xs

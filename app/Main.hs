@@ -9,21 +9,18 @@ module Main ( main ) where
 
 import Control.Exception    ( handle )
 import System.Exit          ( ExitCode(ExitFailure)
-                            , exitWith
-                            )
+                            , exitWith )
 import System.Environment   ( getArgs )
 import System.Random        ( newStdGen )
+
 import Errors               ( CompressorError(ArgumentError
                                              , FileParse
-                                             , FileParseColorError
-                                             )
+                                             , FileParseColorError)
                             )
-import Usage
 import CompressorConf       ( getCompressorConf )
-import ArgumentParsing.Parsing
-import Compressor
-import Cluster.Cluster
-import Vector.Vector
+import ArgumentParsing.Parsing ( parseArgs, Conf(..) )
+import Compressor ( compress )
+import Cluster.Cluster ( Cluster )
 
 main :: IO ()
 main = handle
@@ -33,8 +30,6 @@ main = handle
 launchApp :: Either String Conf -> IO ()
 launchApp (Left str)                       = putStrLn str
 launchApp (Right conf@(Conf _ _ filePath)) = readLines filePath >>= (\fileContent -> newStdGen >>= (\seed -> printClusters $ compress seed $ getCompressorConf conf fileContent))
--- launchApp args       = let conf@(Conf _ _ filePath) = parseArgs args in readLines filePath >>= print . compress (mkStdGen 230844504580) . getCompressorConf conf
--- launchApp args       = let conf@(Conf _ _ filePath) = parseArgs args in readLines filePath >>= print . getCompressorConf conf
 
 printClusters :: [Cluster] -> IO ()
 printClusters = mapM_ print
