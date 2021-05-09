@@ -101,4 +101,4 @@ insertPixel' i (r@(cs, ps) : rs) p idx
 
 
 deletePrevCluster :: [((ClusterPos, ClusterPos), [Pixel])] -> [Cluster]
-deletePrevCluster = foldr (\((newCs, _), newPs) acc -> Cluster newCs newPs : acc) []
+deletePrevCluster = foldr (\((cs, _), ps) acc -> Cluster cs ps : acc) []

@@ -53,4 +53,6 @@ finalConfCheck (Left  str                                                       
 finalConfCheck (Right (ParsingConf Nothing         _              _                    )) = throw $ ArgumentError "Missing/Invalid number of colors."
 finalConfCheck (Right (ParsingConf _               Nothing        _                    )) = throw $ ArgumentError "Missing/Invalid convergence limit."
 finalConfCheck (Right (ParsingConf _               _              Nothing              )) = throw $ ArgumentError "Missing/Invalid file path."
-finalConfCheck (Right (ParsingConf (Just nbColors) (Just nbLimit) (Just stringFilepath))) = Right $ Conf nbColors nbLimit stringFilepath
+finalConfCheck (Right (ParsingConf (Just nbColors) (Just nbLimit) (Just stringFilepath)))
+    | nbColors <= 0 = throw $ ArgumentError "Invalid number of colors (should be 0 < n < +Inf)"
+    | otherwise = Right $ Conf nbColors nbLimit stringFilepath
