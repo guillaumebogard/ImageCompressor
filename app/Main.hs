@@ -7,20 +7,20 @@
 
 module Main ( main ) where
 
-import Control.Exception    ( handle )
-import System.Exit          ( ExitCode(ExitFailure)
-                            , exitWith
-                            )
-import System.Environment   ( getArgs )
-import System.Random        ( newStdGen )
+import Control.Exception        ( handle )
+import System.Exit              ( ExitCode(ExitFailure)
+                                , exitWith )
+import System.Environment       ( getArgs )
+import System.Random            ( newStdGen )
 
-import Errors               ( CompressorError(ArgumentError
-                                             , FileParse
-                                             , FileParseColorError))
-import CompressorConf       ( getCompressorConf )
-import ArgumentParsing.Parsing ( parseArgs, Conf(..) )
-import Compressor ( compress )
-import Cluster.Cluster ( Cluster )
+import Errors                   ( CompressorError(  ArgumentError
+                                                  , FileParse
+                                                  , FileParseColorError
+                                                  ) )
+import CompressorConf           ( getCompressorConf )
+import ArgumentParsing.Parsing  ( parseArgs, Conf(..) )
+import Compressor               ( compress )
+import Cluster.Cluster          ( Cluster )
 
 main :: IO ()
 main = handle
@@ -28,7 +28,7 @@ main = handle
         (getArgs >>= launchApp . parseArgs)
 
 launchApp :: Either String Conf -> IO ()
-launchApp (Left str)                       = putStrLn str
+launchApp (Left  str)                      = putStrLn str
 launchApp (Right conf@(Conf _ _ filePath)) = readLines filePath >>= (\fileContent -> newStdGen >>= (\seed -> printClusters $ compress seed $ getCompressorConf conf fileContent))
 
 printClusters :: [Cluster] -> IO ()

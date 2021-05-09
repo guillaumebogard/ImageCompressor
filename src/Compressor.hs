@@ -80,14 +80,14 @@ insertColor :: [(Int, ColorRGB)] -> ColorRGB -> Index -> [(Int, ColorRGB)]
 insertColor = insertColor' 0
 
 insertColor' :: Index -> [(Int, ColorRGB)] -> ColorRGB -> Index -> [(Int, ColorRGB)]
-insertColor' _ []                            _                    _   = []
-insertColor' i (t@(nb, Vector3 tx ty tz):ts) c@(Vector3 cx cy cz) idx
+insertColor' _ []                              _                    _   = []
+insertColor' i (t@(nb, Vector3 tx ty tz) : ts) c@(Vector3 cx cy cz) idx
     | i == idx  = (nb + 1, Vector3 (tx + cx) (ty + cy) (tz + cz)) : ts
     | otherwise = t : insertColor' (i + 1) ts c idx
 
 
 linkPixelsToClusters :: [Pixel] -> ([ClusterPos], [PrevClusterPos]) -> [Cluster]
-linkPixelsToClusters ps (cs, prev) = foldr (\((newCs, _), newPs) acc -> Cluster newCs newPs : acc) [] $ foldr (\p@(Pixel _ col) acc -> insertPixel acc p $ findClosestCluster prev col) (zipWith (\c pr -> ((c, pr), [])) cs prev) ps
+linkPixelsToClusters ps (cs, prev) = deletePrevCluster $ foldr (\p@(Pixel _ col) acc -> insertPixel acc p $ findClosestCluster prev col) (zipWith (\c pr -> ((c, pr), [])) cs prev) ps
 
 
 insertPixel :: [((ClusterPos, ClusterPos), [Pixel])] -> Pixel -> Int -> [((ClusterPos, ClusterPos), [Pixel])]
@@ -98,3 +98,7 @@ insertPixel' _ []                _ _    = []
 insertPixel' i (r@(cs, ps) : rs) p idx
     | i == idx  = (cs, p : ps) : rs
     | otherwise = r : insertPixel' (i + 1) rs p idx
+
+
+deletePrevCluster :: [((ClusterPos, ClusterPos), [Pixel])] -> [Cluster]
+deletePrevCluster = foldr (\((newCs, _), newPs) acc -> Cluster newCs newPs : acc) []

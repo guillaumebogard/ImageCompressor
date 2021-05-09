@@ -17,9 +17,8 @@ import Text.Read              ( readMaybe )
 
 import Errors                 ( CompressorError(..) )
 import ArgumentParsing.Lexing ( TOKEN(..)
-                              , tokenize
-                              )
-import Usage ( usage )
+                              , tokenize )
+import Usage                  ( usage )
 
 type NumberColors   = Int
 type NumberLimit    = Float

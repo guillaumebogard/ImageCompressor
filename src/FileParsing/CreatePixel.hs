@@ -5,20 +5,26 @@
 -- CreatePixel
 --
 
-module FileParsing.CreatePixel ( createPixel ) where
+module FileParsing.CreatePixel  ( createPixel ) where
 
-import Text.Read               ( readMaybe )
-import Control.Exception       ( throw )
+import Text.Read                ( readMaybe )
+import Control.Exception        ( throw )
 
-import Errors                  ( CompressorError(..) )
-import FileParsing.PixelLexing ( TOKEN(..), tokenize )
-import FileParsing.Pixel       ( ColorRGB, Pixel(..), ColorB, ColorG, ColorR )
-import Vector.Vector           ( Vector3(Vector3), Vector2(Vector2) )
+import Errors                   ( CompressorError(..) )
+import FileParsing.PixelLexing  ( TOKEN(..)
+                                , tokenize )
+import FileParsing.Pixel        ( ColorRGB
+                                , Pixel(..)
+                                , ColorB
+                                , ColorG
+                                , ColorR )
+import Vector.Vector            ( Vector3(Vector3)
+                                , Vector2(Vector2) )
 
 data ParsingPixel = ParsingPixel (Maybe Int, Maybe Int) (Maybe ColorR, Maybe ColorG, Maybe ColorB)
 
 createPixel :: String -> Pixel
-createPixel str = finalPixelCheck $ parsing $ foldr tokenize [] str
+createPixel str = finalPixelCheck $ parsing $ tokenize str
 
 parsing :: [TOKEN] -> ParsingPixel
 parsing [Splitter '(', Number x, Splitter ',', Number y, Splitter ')', Splitter ' ', Splitter '(', Number r, Splitter ',', Number g, Splitter ',', Number b, Splitter ')']
@@ -33,7 +39,7 @@ finalPixelCheck (ParsingPixel (_      , _      ) (_      , Nothing, _      )) = 
 finalPixelCheck (ParsingPixel (_      , _      ) (_      , _      , Nothing)) = throw FileParse
 finalPixelCheck (ParsingPixel (Just x , Just y ) (Just r , Just g , Just b ))
     | isValidColor (Vector3 r g b) = Pixel (Vector2 x y) $ Vector3 r g b
-    | otherwise                        = throw FileParseColorError
+    | otherwise                    = throw FileParseColorError
 
 isValidColor :: ColorRGB -> Bool
 isValidColor (Vector3 r g b)
