@@ -7,17 +7,17 @@
 
 {-# LANGUAGE GADTs #-}
 
-module Vector.Vector ( Vector2(..)
-                     , Vector3(..)
-                     , getDistanceVector2
-                     , getDistanceVector3
-                     , getLengthVector2
-                     , getLengthVector3
-                     , vector2itn
-                     , vector3itn
-                     , vector2fti
-                     , vector3fti
-                     ) where
+module Vector ( Vector2(..)
+              , Vector3(..)
+              , getDistanceVector2
+              , getDistanceVector3
+              , getLengthVector2
+              , getLengthVector3
+              , vector2itn
+              , vector3itn
+              , vector2fti
+              , vector3fti
+              ) where
 
 data Vector2 a where Vector2 :: Num a => a -> a -> Vector2 a
 instance Show a => Show (Vector2 a) where

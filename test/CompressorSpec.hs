@@ -7,27 +7,19 @@
 
 module CompressorSpec ( spec ) where
 
-import Test.Hspec   ( Spec
-                    , it
-                    , shouldBe
-                    , shouldThrow
-                    , anyException)
+import Test.Hspec           ( Spec
+                            , it
+                            , shouldBe
+                            , shouldThrow
+                            , anyException )
 
-import Control.Exception (evaluate)
-import System.Random
+import System.Random        ( mkStdGen )
 
-import ArgumentParsing.Lexing
-import ArgumentParsing.Parsing
-import Cluster.Cluster
-import FileParsing.CreatePixel
-import FileParsing.Pixel
-import FileParsing.PixelLexing
-import Vector.Vector
-import Compressor
-import CompressorConf
-import Errors
-import RandomManager
-import Usage
+import Cluster              ( Cluster(Cluster) )
+import FileParsing.Pixel    ( Pixel(Pixel) )
+import Vector               ( Vector3(Vector3), Vector2(Vector2) )
+import Compressor           ( compress )
+import CompressorConf       ( CompressorConf(CompressorConf) )
 
 spec :: Spec
 spec = do
@@ -43,70 +35,6 @@ spec = do
                    , Pixel (Vector2 1 3) (Vector3 38 21 112) -- 9 J
                  ]
     let seed = mkStdGen 230844504580
-
-    it "makeNbRandomsUnique" $ makeNbRandomsUnique seed 0 9   `shouldBe` []
-    it "makeNbRandomsUnique" $ makeNbRandomsUnique seed 2 9   `shouldBe` [8, 7]
-    it "makeNbRandomsUnique" $ makeNbRandomsUnique seed 4 100 `shouldBe` [52, 6, 90, 68]
-    it "makeNbRandomsUnique" $ makeNbRandomsUnique seed 2 2   `shouldBe` [0, 2]
-    it "makeNbRandomsUnique" $ makeNbRandomsUnique seed 7 7   `shouldBe` [2, 1, 6, 7, 0, 5, 4]
-
-    it "generateMoves" $ generateMoves [] [] `shouldBe` []
-    it "generateMoves" $ generateMoves [Vector3  0    0        0] [] `shouldBe` []
-    it "generateMoves" $ generateMoves [(Vector3 33.0 21.11111 113.5), (Vector3 33.0 32.0 112.0)] [(9, Vector3 306 181 990), (1, Vector3 33 32 112)] `shouldBe` [(Vector3 1 (-1) (-3.5)), (Vector3 0 0 0)]
-
-    it "findClosestCluster" $ findClosestCluster []                                                     (Vector3 33 18 109) `shouldBe` -1
-    it "findClosestCluster" $ findClosestCluster [Vector3 34.0 20.11111 110.0, Vector3 33.0 32.0 112.0] (Vector3 33 18 109) `shouldBe` 0
-    it "findClosestCluster" $ findClosestCluster [Vector3 34.0 20.11111 110.0, Vector3 33.0 32.0 112.0] (Vector3 33 18 109) `shouldBe` 0
-    it "findClosestCluster" $ findClosestCluster [Vector3 34.0 20.11111 110.0, Vector3 33.0 32.0 112.0] (Vector3 33 21 109) `shouldBe` 0
-    it "findClosestCluster" $ findClosestCluster [Vector3 34.0 20.11111 110.0, Vector3 33.0 32.0 112.0] (Vector3 33 21 112) `shouldBe` 0
-    it "findClosestCluster" $ findClosestCluster [Vector3 34.0 20.11111 110.0, Vector3 33.0 32.0 112.0] (Vector3 33 25 112) `shouldBe` 0
-    it "findClosestCluster" $ findClosestCluster [Vector3 34.0 20.11111 110.0, Vector3 33.0 32.0 112.0] (Vector3 33 18 109) `shouldBe` 0
-    it "findClosestCluster" $ findClosestCluster [Vector3 34.0 20.11111 110.0, Vector3 33.0 32.0 112.0] (Vector3 35 18 109) `shouldBe` 0
-    it "findClosestCluster" $ findClosestCluster [Vector3 34.0 20.11111 110.0, Vector3 33.0 32.0 112.0] (Vector3 35 21 109) `shouldBe` 0
-    it "findClosestCluster" $ findClosestCluster [Vector3 34.0 20.11111 110.0, Vector3 33.0 32.0 112.0] (Vector3 38 21 112) `shouldBe` 0
-    it "findClosestCluster" $ findClosestCluster [Vector3 34.0 20.11111 110.0, Vector3 33.0 32.0 112.0] (Vector3 33 32 112) `shouldBe` 1
-
-    it "findClosestCluster" $ findClosestCluster [Vector3 34.125 19.5 109.75, Vector3 33 28.5 112] (Vector3 33 18 109) `shouldBe` 0
-    it "findClosestCluster" $ findClosestCluster [Vector3 34.125 19.5 109.75, Vector3 33 28.5 112] (Vector3 33 18 109) `shouldBe` 0
-    it "findClosestCluster" $ findClosestCluster [Vector3 34.125 19.5 109.75, Vector3 33 28.5 112] (Vector3 33 21 109) `shouldBe` 0
-    it "findClosestCluster" $ findClosestCluster [Vector3 34.125 19.5 109.75, Vector3 33 28.5 112] (Vector3 33 21 112) `shouldBe` 0
-    it "findClosestCluster" $ findClosestCluster [Vector3 34.125 19.5 109.75, Vector3 33 28.5 112] (Vector3 33 18 109) `shouldBe` 0
-    it "findClosestCluster" $ findClosestCluster [Vector3 34.125 19.5 109.75, Vector3 33 28.5 112] (Vector3 35 18 109) `shouldBe` 0
-    it "findClosestCluster" $ findClosestCluster [Vector3 34.125 19.5 109.75, Vector3 33 28.5 112] (Vector3 35 21 109) `shouldBe` 0
-    it "findClosestCluster" $ findClosestCluster [Vector3 34.125 19.5 109.75, Vector3 33 28.5 112] (Vector3 38 21 112) `shouldBe` 0
-    it "findClosestCluster" $ findClosestCluster [Vector3 34.125 19.5 109.75, Vector3 33 28.5 112] (Vector3 33 25 112) `shouldBe` 1
-    it "findClosestCluster" $ findClosestCluster [Vector3 34.125 19.5 109.75, Vector3 33 28.5 112] (Vector3 33 32 112) `shouldBe` 1
-
-    it "findClosestCluster" $ findClosestCluster [Vector3 33.0 18.0 109.0, Vector3 34.166668 23.5 111.0] (Vector3 33 18 109) `shouldBe` 0
-    it "findClosestCluster" $ findClosestCluster [Vector3 33.0 18.0 109.0, Vector3 34.166668 23.5 111.0] (Vector3 33 18 109) `shouldBe` 0
-    it "findClosestCluster" $ findClosestCluster [Vector3 33.0 18.0 109.0, Vector3 34.166668 23.5 111.0] (Vector3 33 18 109) `shouldBe` 0
-    it "findClosestCluster" $ findClosestCluster [Vector3 33.0 18.0 109.0, Vector3 34.166668 23.5 111.0] (Vector3 35 18 109) `shouldBe` 0
-    it "findClosestCluster" $ findClosestCluster [Vector3 33.0 18.0 109.0, Vector3 34.166668 23.5 111.0] (Vector3 33 21 109) `shouldBe` 0
-    it "findClosestCluster" $ findClosestCluster [Vector3 33.0 18.0 109.0, Vector3 34.166668 23.5 111.0] (Vector3 33 21 112) `shouldBe` 1
-    it "findClosestCluster" $ findClosestCluster [Vector3 33.0 18.0 109.0, Vector3 34.166668 23.5 111.0] (Vector3 33 25 112) `shouldBe` 1
-    it "findClosestCluster" $ findClosestCluster [Vector3 33.0 18.0 109.0, Vector3 34.166668 23.5 111.0] (Vector3 33 32 112) `shouldBe` 1
-    it "findClosestCluster" $ findClosestCluster [Vector3 33.0 18.0 109.0, Vector3 34.166668 23.5 111.0] (Vector3 35 21 109) `shouldBe` 1
-    it "findClosestCluster" $ findClosestCluster [Vector3 33.0 18.0 109.0, Vector3 34.166668 23.5 111.0] (Vector3 38 21 112) `shouldBe` 1
-
-    it "findClosestCluster" $ findClosestCluster [Vector3 33.57143 19.285715 109.42857, Vector3 33.0 28.5 112.0] (Vector3 33 18 109) `shouldBe` 0
-    it "findClosestCluster" $ findClosestCluster [Vector3 33.57143 19.285715 109.42857, Vector3 33.0 28.5 112.0] (Vector3 33 18 109) `shouldBe` 0
-    it "findClosestCluster" $ findClosestCluster [Vector3 33.57143 19.285715 109.42857, Vector3 33.0 28.5 112.0] (Vector3 33 21 109) `shouldBe` 0
-    it "findClosestCluster" $ findClosestCluster [Vector3 33.57143 19.285715 109.42857, Vector3 33.0 28.5 112.0] (Vector3 33 21 112) `shouldBe` 0
-    it "findClosestCluster" $ findClosestCluster [Vector3 33.57143 19.285715 109.42857, Vector3 33.0 28.5 112.0] (Vector3 33 18 109) `shouldBe` 0
-    it "findClosestCluster" $ findClosestCluster [Vector3 33.57143 19.285715 109.42857, Vector3 33.0 28.5 112.0] (Vector3 35 18 109) `shouldBe` 0
-    it "findClosestCluster" $ findClosestCluster [Vector3 33.57143 19.285715 109.42857, Vector3 33.0 28.5 112.0] (Vector3 35 21 109) `shouldBe` 0
-    it "findClosestCluster" $ findClosestCluster [Vector3 33.57143 19.285715 109.42857, Vector3 33.0 28.5 112.0] (Vector3 38 21 112) `shouldBe` 0
-    it "findClosestCluster" $ findClosestCluster [Vector3 33.57143 19.285715 109.42857, Vector3 33.0 28.5 112.0] (Vector3 33 25 112) `shouldBe` 1
-    it "findClosestCluster" $ findClosestCluster [Vector3 33.57143 19.285715 109.42857, Vector3 33.0 28.5 112.0] (Vector3 33 32 112) `shouldBe` 1
-
-    it "findClosestCluster" $ findClosestCluster [Vector3 4 4 0, Vector3 4 4 8, Vector3 4 4 4, Vector3 4 4 12] (Vector3 8 4 (-2)) `shouldBe` 0
-    it "findClosestCluster" $ findClosestCluster [Vector3 4 4 0, Vector3 4 4 8, Vector3 4 4 4, Vector3 4 4 12] (Vector3 8 4 2   ) `shouldBe` 0
-    it "findClosestCluster" $ findClosestCluster [Vector3 4 4 0, Vector3 4 4 8, Vector3 4 4 4, Vector3 4 4 12] (Vector3 8 4 6   ) `shouldBe` 1
-    it "findClosestCluster" $ findClosestCluster [Vector3 4 4 0, Vector3 4 4 8, Vector3 4 4 4, Vector3 4 4 12] (Vector3 8 4 7   ) `shouldBe` 1
-    it "findClosestCluster" $ findClosestCluster [Vector3 4 4 0, Vector3 4 4 8, Vector3 4 4 4, Vector3 4 4 12] (Vector3 8 4 10  ) `shouldBe` 1
-    it "findClosestCluster" $ findClosestCluster [Vector3 4 4 0, Vector3 4 4 8, Vector3 4 4 4, Vector3 4 4 12] (Vector3 8 4 3   ) `shouldBe` 2
-    it "findClosestCluster" $ findClosestCluster [Vector3 4 4 0, Vector3 4 4 8, Vector3 4 4 4, Vector3 4 4 12] (Vector3 8 4 11  ) `shouldBe` 3
-    it "findClosestCluster" $ findClosestCluster [Vector3 4 4 0, Vector3 4 4 8, Vector3 4 4 4, Vector3 4 4 12] (Vector3 8 4 17  ) `shouldBe` 3
 
     it "compress" $ compress seed (CompressorConf 0 0.8 pixels) `shouldBe` []
     it "compress" $ compress seed (CompressorConf 2 0.8 []    ) `shouldBe` []

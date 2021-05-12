@@ -5,21 +5,21 @@
 -- Cluster
 --
 
-module Cluster.Cluster   ( Move3D
-                         , ClusterPos
-                         , Cluster(..)
-                         , Index
-                         , applyMove
-                         , generateMoves
-                         , findClosestCluster
-                         ) where
+module Cluster            ( Move3D
+                          , ClusterPos
+                          , Cluster(..)
+                          , Index
+                          , applyMove
+                          , generateMoves
+                          , findClosestCluster
+                          ) where
 
-import Vector.Vector     ( Vector3(..)
-                         , vector3fti
-                         , getDistanceVector3
-                         , vector3itn )
-import FileParsing.Pixel ( ColorRGB
-                         , Pixel )
+import Vector             ( Vector3(..)
+                          , vector3fti
+                          , getDistanceVector3
+                          , vector3itn )
+import FileParsing.Pixel  ( ColorRGB
+                          , Pixel )
 
 type Move3D     = Vector3 Float
 type Index      = Int

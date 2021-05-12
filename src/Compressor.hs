@@ -5,24 +5,24 @@
 -- Compressor
 --
 
-module Compressor        ( compress ) where
+module Compressor         ( compress ) where
 
-import Data.List         ( sort )
-import System.Random     ( RandomGen )
+import Data.List          ( sort )
+import System.Random      ( RandomGen )
 
-import CompressorConf    ( CompressorConf(..) )
-import FileParsing.Pixel ( ColorRGB, Pixel(..) )
-import RandomManager     ( makeNbRandomsUnique )
-import Vector.Vector     ( Vector3(..)
-                         , getLengthVector3
-                         , vector3itn )
-import Cluster.Cluster   ( Move3D
-                         , ClusterPos
-                         , Cluster(..)
-                         , Index
-                         , applyMove
-                         , generateMoves
-                         , findClosestCluster )
+import CompressorConf     ( CompressorConf(..) )
+import FileParsing.Pixel  ( ColorRGB, Pixel(..) )
+import RandomManager      ( makeNbRandomsUnique )
+import Vector             ( Vector3(..)
+                          , getLengthVector3
+                          , vector3itn )
+import Cluster            ( Move3D
+                          , ClusterPos
+                          , Cluster(..)
+                          , Index
+                          , applyMove
+                          , generateMoves
+                          , findClosestCluster )
 
 type PrevClusterPos = ClusterPos
 

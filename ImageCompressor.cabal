@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 2fc1e0e664ee68b02d09f1b706c61bfe3aaf408ed4542fe084f3aac3db837fff
+-- hash: 3b81195a1c03682bd97ff34f3d8b9cae4607b0932dee0acff0954d595f5692e6
 
 name:           ImageCompressor
 version:        0.1.0.0
@@ -29,16 +29,17 @@ library
   exposed-modules:
       ArgumentParsing.Lexing
       ArgumentParsing.Parsing
-      Cluster.Cluster
+      Cluster
       Compressor
       CompressorConf
       Errors
       FileParsing.CreatePixel
       FileParsing.Pixel
       FileParsing.PixelLexing
+      FileParsing.PixelParsing
       RandomManager
       Usage
-      Vector.Vector
+      Vector
   other-modules:
       Paths_ImageCompressor
   hs-source-dirs:
@@ -65,7 +66,12 @@ test-suite ImageCompressor-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      ArgumentParsingSpec
+      ClusterSpec
       CompressorSpec
+      FileParsingSpec
+      RandomManagerSpec
+      VectorSpec
       Paths_ImageCompressor
   hs-source-dirs:
       test

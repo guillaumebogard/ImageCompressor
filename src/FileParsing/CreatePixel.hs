@@ -7,29 +7,20 @@
 
 module FileParsing.CreatePixel  ( createPixel ) where
 
-import Text.Read                ( readMaybe )
 import Control.Exception        ( throw )
 
 import Errors                   ( CompressorError(..) )
-import FileParsing.PixelLexing  ( TOKEN(..)
-                                , tokenize )
+import FileParsing.PixelLexing  ( tokenize )
 import FileParsing.Pixel        ( ColorRGB
-                                , Pixel(..)
-                                , ColorB
-                                , ColorG
-                                , ColorR )
-import Vector.Vector            ( Vector3(Vector3)
+                                , Pixel(..) )
+import FileParsing.PixelParsing ( parsing
+                                , ParsingPixel(ParsingPixel)
+                                )
+import Vector                   ( Vector3(Vector3)
                                 , Vector2(Vector2) )
-
-data ParsingPixel = ParsingPixel (Maybe Int, Maybe Int) (Maybe ColorR, Maybe ColorG, Maybe ColorB)
 
 createPixel :: String -> Pixel
 createPixel str = finalPixelCheck $ parsing $ tokenize str
-
-parsing :: [TOKEN] -> ParsingPixel
-parsing [Splitter '(', Number x, Splitter ',', Number y, Splitter ')', Splitter ' ', Splitter '(', Number r, Splitter ',', Number g, Splitter ',', Number b, Splitter ')']
-           = ParsingPixel (readMaybe x, readMaybe y) (readMaybe r, readMaybe g, readMaybe b)
-parsing _  = throw FileParse
 
 finalPixelCheck :: ParsingPixel -> Pixel
 finalPixelCheck (ParsingPixel (Nothing, _      ) (_      , _      , _      )) = throw FileParse

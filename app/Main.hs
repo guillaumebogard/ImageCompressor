@@ -20,7 +20,7 @@ import Errors                   ( CompressorError(  ArgumentError
 import CompressorConf           ( getCompressorConf )
 import ArgumentParsing.Parsing  ( parseArgs, Conf(..) )
 import Compressor               ( compress )
-import Cluster.Cluster          ( Cluster )
+import Cluster                  ( Cluster )
 
 main :: IO ()
 main = handle
