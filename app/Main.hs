@@ -22,6 +22,9 @@ import ArgumentParsing.Parsing  ( parseArgs, Conf(..) )
 import Compressor               ( compress )
 import Cluster                  ( Cluster )
 
+-- no type use newtype
+-- no lambda but func
+
 main :: IO ()
 main = handle
         handleErrors

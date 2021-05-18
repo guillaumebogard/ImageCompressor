@@ -25,6 +25,8 @@ instance Show a => Show (Vector2 a) where
 instance Eq a => Eq (Vector2 a) where
     (==) (Vector2 x1 y1) (Vector2 x2 y2) = x1 == x2 && y1 == y2
 
+-- data Vector3 a b c where Vector3 :: (Num a, Num b, Num c) => a -> b -> c -> Vector3 a b c
+-- instance (Show a, Show b, Show c) => Show (Vector3 a b c) where
 data Vector3 a where Vector3 :: Num a => a -> a -> a -> Vector3 a
 instance Show a => Show (Vector3 a) where
     show (Vector3 x y z)    = '(' : show x ++ ',' : show y ++ ',' : show z ++ ")"
@@ -34,6 +36,7 @@ instance Eq a => Eq (Vector3 a) where
 getDistanceVector2 :: Floating a => Vector2 a -> Vector2 a -> a
 getDistanceVector2 (Vector2 x1 y1) (Vector2 x2 y2) = sqrt ((x1 - x2) ^ (2 :: Integer) + (y1 - y2) ^ (2 :: Integer))
 
+-- getDistanceVector3 :: (Floating a, Floating b, Floating c) => Vector3 a b c -> Vector3 a b c -> Distance d
 getDistanceVector3 :: Floating a => Vector3 a -> Vector3 a -> a
 getDistanceVector3 (Vector3 x1 y1 z1) (Vector3 x2 y2 z2) = sqrt ((x1 - x2) ^ (2 :: Integer) + (y1 - y2) ^ (2 :: Integer) + (z1 - z2) ^ (2 :: Integer))
 

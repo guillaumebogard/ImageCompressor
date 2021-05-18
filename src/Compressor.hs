@@ -76,6 +76,17 @@ generateEmptyTotals 0   = []
 generateEmptyTotals idx = (0, Vector3 0 0 0) : generateEmptyTotals (idx - 1)
 
 
+
+-- [
+--     (1, 2, 3), -- A
+--     (1, 2, 3), -- B
+--     (1, 2, 3), -- C
+-- ]
+-- [
+--     (1, (255,       255,       255)), -- A
+--     (6, (255 + 233, 255 + 244, 255 + 255)), -- B
+--     (3, (255,       255,       255)), -- C
+-- ]
 insertColor :: [(Int, ColorRGB)] -> ColorRGB -> Index -> [(Int, ColorRGB)]
 insertColor = insertColor' 0
 

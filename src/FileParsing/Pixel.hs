@@ -14,6 +14,9 @@ module FileParsing.Pixel  ( ColorRGB
 
 import Vector             ( Vector2, Vector3(..) )
 
+-- newtype ColorR = ColorR ColorUnit
+-- newtype ColorB = ColorB ColorUnit
+-- newtype ColorG = ColorG ColorUnit -- and you derive to get sub and etc
 type ColorUnit = Int
 type ColorR    = ColorUnit
 type ColorG    = ColorUnit
@@ -22,7 +25,7 @@ type ColorRGB  = Vector3 ColorUnit
 
 type PixelPos  = Vector2 Int
 
-data Pixel = Pixel PixelPos ColorRGB
+data Pixel = Pixel PixelPos ColorRGB -- make a factory that check the color (isValidColor :: ColorRGB -> Bool) (and throw)
 instance Show Pixel where
     show (Pixel pos color) = show pos ++ ' ' : show color
 instance Eq Pixel where
