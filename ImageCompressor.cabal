@@ -4,42 +4,31 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 3b81195a1c03682bd97ff34f3d8b9cae4607b0932dee0acff0954d595f5692e6
+-- hash: 0f0e442ebdc551026febe1d88f0459bcc82d6c1306582604a447650a535909c8
 
 name:           ImageCompressor
 version:        0.1.0.0
-description:    Please see the README on GitHub at <https://github.com/githubuser/ImageCompressor#readme>
-homepage:       https://github.com/githubuser/ImageCompressor#readme
-bug-reports:    https://github.com/githubuser/ImageCompressor/issues
-author:         Author name here
-maintainer:     example@example.com
-copyright:      2021 Author name here
+description:    Please see the README on GitHub at <https://github.com/guillaumebgd/ImageCompressor/blob/master/README.md>
+homepage:       https://github.com/guillaumebgd/ImageCompressor#readme
+bug-reports:    https://github.com/guillaumebgd/ImageCompressor/issues
+author:         Guillaume Bogard-Coquard
+maintainer:     guillaume.bogardcoquard@gmail.com
+copyright:      2022 Guillaume Bogard-Coquard
 license:        BSD3
 license-file:   LICENSE
 build-type:     Simple
 extra-source-files:
     README.md
-    ChangeLog.md
 
 source-repository head
   type: git
-  location: https://github.com/githubuser/ImageCompressor
+  location: https://github.com/guillaumebgd/ImageCompressor
 
 library
   exposed-modules:
-      ArgumentParsing.Lexing
-      ArgumentParsing.Parsing
-      Cluster
-      Compressor
-      CompressorConf
-      Errors
-      FileParsing.CreatePixel
-      FileParsing.Pixel
-      FileParsing.PixelLexing
-      FileParsing.PixelParsing
-      RandomManager
-      Usage
-      Vector
+      Argument.Lexer
+      Argument.Parser
+      Argument.Parser.Exception
   other-modules:
       Paths_ImageCompressor
   hs-source-dirs:
@@ -66,12 +55,7 @@ test-suite ImageCompressor-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      ArgumentParsingSpec
-      ClusterSpec
-      CompressorSpec
-      FileParsingSpec
-      RandomManagerSpec
-      VectorSpec
+      Argument.Lexer.Spec
       Paths_ImageCompressor
   hs-source-dirs:
       test

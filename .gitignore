@@ -1,6 +1,10 @@
-# Stack, Cabal, ghc... files
+# This project
 
-*~
+/imageCompressor
+/stack.yaml.lock
+
+# Haskell Projects
+
 dist
 dist-*
 cabal-dev
@@ -25,22 +29,6 @@ cabal.project.local~
 .HTF/
 .ghc.environment.*
 
-# IDE
+# Projects
 
-.vscode
-
-# Others
-
-example.txt
-
-# Bin
-
-imageCompressor
-
-# Tmp Files
-
-*[Tt][Mm][Pp]*
-*[Tt][Oo][ _\-][Dd][Ee][Ll]*
-*[Tt][Oo][Dd][Ee][Ll]*
-*zip*
-
+.vscode/
